@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', onScrollFadeIn);
 // Кнопка "Наверх"
 const toTopBtn = document.getElementById('toTopBtn');
 window.addEventListener('scroll', function() {
+    if (!toTopBtn) return;
     if (window.scrollY > 300) {
         toTopBtn.style.display = 'block';
     } else {
