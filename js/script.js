@@ -2,6 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingForm = document.getElementById('booking-form');
     const formMessage = document.getElementById('form-message');
 
+    // Автозаполнение из localStorage
+    if (bookingForm) {
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+        if (nameInput && localStorage.getItem('afrodita_name')) {
+            nameInput.value = localStorage.getItem('afrodita_name');
+        }
+        if (phoneInput && localStorage.getItem('afrodita_phone')) {
+            phoneInput.value = localStorage.getItem('afrodita_phone');
+        }
+    }
+
     if (bookingForm) {
         bookingForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -26,6 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessage.style.color = 'red';
                 return;
             }
+
+            // Сохраняем имя и телефон в localStorage
+            localStorage.setItem('afrodita_name', name);
+            localStorage.setItem('afrodita_phone', phone);
 
             // Отправка заявки на сервер
             fetch('https://afrodita.onrender.com/api/requests', {

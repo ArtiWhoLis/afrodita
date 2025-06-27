@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 await fetchRequests();
             });
         });
+        renderCalendar(requests);
     }
 
     if (filterDate) filterDate.addEventListener('input', showRequests);
@@ -69,4 +70,50 @@ document.addEventListener('DOMContentLoaded', function() {
         adminRequests.style.display = 'block';
         fetchRequests();
     }
-}); 
+});
+
+// === КАЛЕНДАРЬ ДЛЯ АДМИНА ===
+function renderCalendar(requests) {
+    const calendarContainerId = 'admin-calendar';
+    let calendarContainer = document.getElementById(calendarContainerId);
+    if (!calendarContainer) {
+        calendarContainer = document.createElement('div');
+        calendarContainer.id = calendarContainerId;
+        calendarContainer.style.marginTop = '40px';
+        calendarContainer.style.overflowX = 'auto';
+        adminRequests.appendChild(calendarContainer);
+    }
+    // Дни недели (7 дней от сегодня)
+    const days = [];
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        days.push(d.toISOString().slice(0, 10));
+    }
+    // Временные слоты (как в форме)
+    const times = [
+        '10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30',
+        '15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'
+    ];
+    // Строим таблицу
+    let html = '<table class="admin-table" style="min-width:900px"><thead><tr><th>Время</th>';
+    for (const day of days) {
+        html += `<th>${day}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    for (const time of times) {
+        html += `<tr><td>${time}</td>`;
+        for (const day of days) {
+            const found = requests.find(r => r.date === day && r.time === time);
+            if (found) {
+                html += `<td style="background:#fbe9f2;color:#b96580;font-weight:bold;">${found.name}<br>${found.phone}<br>${found.service}</td>`;
+            } else {
+                html += '<td style="background:#f9f9f9;"></td>';
+            }
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    calendarContainer.innerHTML = '<h3 style="margin-bottom:10px;">Расписание на 7 дней</h3>' + html;
+} 
