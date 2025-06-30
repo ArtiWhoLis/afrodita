@@ -124,7 +124,7 @@ app.post('/api/login', async (req, res) => {
 
 // Админ-логин (жёстко заданные логин и пароль)
 const ADMIN_LOGIN = 'anton';
-const ADMIN_PASSWORD = '4123456789';
+const ADMIN_PASSWORD = '123456';
 
 app.post('/api/admin/login', (req, res) => {
   const { login, password } = req.body;
