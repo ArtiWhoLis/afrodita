@@ -26,8 +26,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const comment = document.getElementById('comment') ? document.getElementById('comment').value : '';
 
             // Basic validation
+            const nameRegex = /^[А-Яа-яA-Za-zЁё\s]{1,40}$/;
             if (!name || !service || !date || !time || !phone) {
                 formMessage.textContent = 'Пожалуйста, заполните все поля.';
+                formMessage.style.color = 'red';
+                return;
+            }
+            if (!nameRegex.test(name)) {
+                formMessage.textContent = 'Имя должно содержать только буквы и быть не длиннее 40 символов.';
+                formMessage.style.color = 'red';
+                return;
+            }
+            // Проверка телефона по маске: +7 (XXX) XXX-XX-XX (18 символов)
+            if (phone.length !== 18) {
+                formMessage.textContent = 'Пожалуйста, введите корректный номер телефона полностью.';
                 formMessage.style.color = 'red';
                 return;
             }

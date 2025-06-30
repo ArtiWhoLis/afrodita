@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const SECRET = process.env.JWT_SECRET || 'afrodita_secret';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -37,6 +40,14 @@ app.post('/api/requests', async (req, res) => {
     return res.status(400).json({ error: 'Заполните все обязательные поля' });
   }
   try {
+    // Проверка занятости времени
+    const exists = await pool.query(
+      'SELECT id FROM requests WHERE date = $1 AND time = $2',
+      [date, time]
+    );
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ error: 'Это время уже занято. Пожалуйста, выберите другое.' });
+    }
     const result = await pool.query(
       'INSERT INTO requests (name, phone, service, date, time, comment) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
       [name, phone, service, date, time, comment]
@@ -62,6 +73,75 @@ app.delete('/api/requests', async (req, res) => {
   try {
     const result = await pool.query('DELETE FROM requests');
     res.json({ deleted: result.rowCount });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Регистрация пользователя
+app.post('/api/register', async (req, res) => {
+  const { fio, phone, password } = req.body;
+  if (!fio || !phone || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' });
+  }
+  try {
+    const exists = await pool.query('SELECT id FROM users WHERE phone = $1', [phone]);
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ error: 'Пользователь с таким номером уже зарегистрирован' });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const result = await pool.query('INSERT INTO users (fio, phone, password) VALUES ($1, $2, $3) RETURNING id, fio, phone', [fio, phone, hash]);
+    const user = result.rows[0];
+    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, fio: user.fio, phone: user.phone } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Вход пользователя
+app.post('/api/login', async (req, res) => {
+  const { phone, password } = req.body;
+  if (!phone || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' });
+  }
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE phone = $1', [phone]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Пользователь не найден' });
+    }
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ error: 'Неверный пароль' });
+    }
+    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, fio: user.fio, phone: user.phone } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Middleware для проверки токена
+function auth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Нет авторизации' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, SECRET);
+    req.userId = payload.id;
+    next();
+  } catch {
+    res.status(401).json({ error: 'Неверный токен' });
+  }
+}
+
+// Профиль пользователя
+app.get('/api/profile', auth, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, fio, phone FROM users WHERE id = $1', [req.userId]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
