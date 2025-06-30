@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const password = document.getElementById('admin-password').value;
-            if (password === '123') {
+            if (password === '4123') {
                 loginDiv.style.display = 'none';
                 adminRequests.style.display = 'block';
                 await fetchRequests();
