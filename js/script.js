@@ -6,11 +6,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bookingForm) {
         const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phone');
-        if (nameInput && localStorage.getItem('afrodita_name')) {
-            nameInput.value = localStorage.getItem('afrodita_name');
-        }
-        if (phoneInput && localStorage.getItem('afrodita_phone')) {
-            phoneInput.value = localStorage.getItem('afrodita_phone');
+        const token = localStorage.getItem('token');
+        if (token && nameInput && phoneInput) {
+            fetch('/api/profile', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(res => res.ok ? res.json() : null)
+            .then(user => {
+                if (user) {
+                    nameInput.value = user.fio;
+                    phoneInput.value = user.phone;
+                    nameInput.readOnly = true;
+                    phoneInput.readOnly = true;
+                }
+            });
+        } else if (nameInput && phoneInput) {
+            nameInput.readOnly = false;
+            phoneInput.readOnly = false;
         }
     }
 
