@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель мастера - Афродита</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Афродита</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="services.html">Услуги</a></li>
+                    <li><a href="booking.html">Запись</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="master.html" class="active">Панель мастера</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="page-title fade-in">
+            <div class="container">
+                <h1>Панель мастера</h1>
+            </div>
+        </section>
+        <section>
+            <div class="container" style="max-width:900px;margin:auto;">
+                <div id="master-info" style="margin-bottom:24px;"></div>
+                <div style="margin-bottom:18px;display:flex;gap:16px;align-items:center;">
+                    <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                    <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Телефон</th>
+                            <th>Услуга</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Комментарий</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Салон красоты "Афродита". Все права защищены.</p>
+        </div>
+    </footer>
+    <script src="js/master.js"></script>
+</body>
+</html> 
