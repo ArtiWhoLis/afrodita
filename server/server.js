@@ -122,6 +122,19 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Админ-логин (жёстко заданные логин и пароль)
+const ADMIN_LOGIN = 'anton';
+const ADMIN_PASSWORD = '4123';
+
+app.post('/api/admin/login', (req, res) => {
+  const { login, password } = req.body;
+  if (login === ADMIN_LOGIN && password === ADMIN_PASSWORD) {
+    const token = jwt.sign({ admin: true }, SECRET, { expiresIn: '7d' });
+    return res.json({ token });
+  }
+  res.status(401).json({ error: 'Неверный логин или пароль администратора' });
+});
+
 // Middleware для проверки токена
 function auth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -133,6 +146,20 @@ function auth(req, res, next) {
     next();
   } catch {
     res.status(401).json({ error: 'Неверный токен' });
+  }
+}
+
+// Middleware для проверки админ-токена
+function adminAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Нет авторизации' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, SECRET);
+    if (!payload.admin) throw new Error();
+    next();
+  } catch {
+    res.status(401).json({ error: 'Нет доступа (требуется админ)' });
   }
 }
 
