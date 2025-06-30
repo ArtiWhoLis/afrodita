@@ -31,25 +31,24 @@
 
         <section class="booking-form-section fade-in">
             <div class="container">
-                <div class="booking-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80" alt="Онлайн-запись" class="booking-img">
+                <div class="profile-summary" style="max-width:400px;margin:auto;margin-bottom:24px;padding:18px 24px;background:#f8f8fa;border-radius:10px;box-shadow:0 2px 8px #0001;display:flex;flex-direction:column;align-items:center;">
+                    <div style="font-size:1.1em;margin-bottom:8px;">Ваш профиль</div>
+                    <div id="profile-fio" style="font-weight:bold;font-size:1.2em;">—</div>
+                    <div id="profile-phone" style="color:#888;">—</div>
+                    <button id="edit-profile-btn" class="btn" style="margin-top:10px;background:#eee;color:#444;">Редактировать профиль</button>
                 </div>
                 <form id="booking-form" class="booking-form">
                     <div class="form-group">
                         <label for="service">Выберите услугу</label>
                         <select id="service" name="service" required>
                             <option value="">--Пожалуйста, выберите--</option>
-                            <option value="manicure">Маникюр и педикюр</option>
-                            <option value="hair">Парикмахерские услуги</option>
-                            <option value="cosmetology">Косметология</option>
-                            <option value="makeup">Макияж и брови</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="date">Выберите дату</label>
                         <input type="date" id="date" name="date" required>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label for="time">Выберите время</label>
                         <select id="time" name="time" required>
                             <option value="">--Выберите время--</option>
@@ -75,14 +74,6 @@
                             <option value="19:30">19:30</option>
                             <option value="20:00">20:00</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="name">Ваше имя</label>
-                        <input type="text" id="name" name="name" placeholder="Введите ваше имя" required maxlength="40" pattern="[А-Яа-яA-Za-zЁё\s]{1,40}" title="Только буквы, до 40 символов">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Номер телефона</label>
-                        <input type="tel" id="phone" name="phone" placeholder="Введите номер телефона" required pattern="\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}" title="Формат: +7 (XXX) XXX-XX-XX">
                     </div>
                     <div class="form-group">
                         <label for="comment">Комментарий (необязательно)</label>

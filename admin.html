@@ -25,7 +25,7 @@
     <main>
         <section class="page-title fade-in">
             <div class="container">
-                <h1>Админ-панель: заявки на услуги</h1>
+                <h1>Админ-панель</h1>
             </div>
         </section>
         <section>
@@ -45,34 +45,78 @@
                         <div id="login-error" style="color:red;text-align:center;"></div>
                     </form>
                 </div>
-                <div id="admin-requests" class="fade-in" style="display:none;">
-                    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
-                        <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                        <select id="filter-service" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                            <option value="">Все услуги</option>
-                            <option value="Маникюр и педикюр">Маникюр и педикюр</option>
-                            <option value="Парикмахерские услуги">Парикмахерские услуги</option>
-                            <option value="Косметология">Косметология</option>
-                            <option value="Макияж и брови">Макияж и брови</option>
-                        </select>
-                        <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                        <button id="clear-requests" class="btn-cancel" style="margin-left:auto;">Очистить все заявки</button>
+                <div id="admin-panel" style="display:none;">
+                    <div class="admin-tabs" style="display:flex;gap:8px;margin-bottom:24px;">
+                        <button class="admin-tab active" data-tab="requests" style="flex:1;">Заявки</button>
+                        <button class="admin-tab" data-tab="services" style="flex:1;">Услуги</button>
+                        <button class="admin-tab" data-tab="masters" style="flex:1;">Мастера</button>
+                        <button class="admin-tab" data-tab="admins" style="flex:1;">Админы</button>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Имя</th>
-                                <th>Телефон</th>
-                                <th>Услуга</th>
-                                <th>Дата</th>
-                                <th>Время</th>
-                                <th>Комментарий</th>
-                                <th>Действие</th>
-                            </tr>
-                        </thead>
-                        <tbody id="requests-body">
-                        </tbody>
-                    </table>
+                    <div id="tab-requests" class="admin-tab-content">
+                        <!-- Секция заявок (будет заполнена js) -->
+                        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+                            <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                            <select id="filter-service" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;"></select>
+                            <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                            <button id="clear-requests" class="btn-cancel" style="margin-left:auto;">Очистить все заявки</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Имя</th>
+                                    <th>Телефон</th>
+                                    <th>Услуга</th>
+                                    <th>Дата</th>
+                                    <th>Время</th>
+                                    <th>Комментарий</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requests-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="tab-services" class="admin-tab-content" style="display:none;">
+                        <!-- Секция услуг (будет заполнена js) -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h2 style="margin:0;font-size:1.2em;">Услуги</h2>
+                            <button id="add-service-btn" class="btn">Добавить услугу</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr><th>Название</th><th>Описание</th><th>Действие</th></tr>
+                            </thead>
+                            <tbody id="services-body"></tbody>
+                        </table>
+                        <div id="service-form-modal" style="display:none;"></div>
+                    </div>
+                    <div id="tab-masters" class="admin-tab-content" style="display:none;">
+                        <!-- Секция мастеров (будет заполнена js) -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h2 style="margin:0;font-size:1.2em;">Мастера</h2>
+                            <button id="add-master-btn" class="btn">Добавить мастера</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr><th>ФИО</th><th>Должность</th><th>Услуги</th><th>Действие</th></tr>
+                            </thead>
+                            <tbody id="masters-body"></tbody>
+                        </table>
+                        <div id="master-form-modal" style="display:none;"></div>
+                    </div>
+                    <div id="tab-admins" class="admin-tab-content" style="display:none;">
+                        <!-- Секция админов (будет заполнена js) -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h2 style="margin:0;font-size:1.2em;">Админы</h2>
+                            <button id="add-admin-btn" class="btn">Добавить админа</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr><th>ФИО</th><th>Телефон</th><th>Роль</th><th>Действие</th></tr>
+                            </thead>
+                            <tbody id="admins-body"></tbody>
+                        </table>
+                        <div id="admin-form-modal" style="display:none;"></div>
+                    </div>
                 </div>
             </div>
         </section>
