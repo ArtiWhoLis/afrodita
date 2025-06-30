@@ -29,6 +29,10 @@
         </section>
         <section class="booking-form-section visible">
             <div class="container">
+                <div class="login-tabs" style="display:flex;justify-content:center;margin-bottom:30px;">
+                    <button type="button" id="tab-user" class="tab-btn active" style="flex:1;padding:12px 0;border:none;background:#fff;border-bottom:2px solid #d17a97;font-weight:bold;cursor:pointer;">Войти в аккаунт</button>
+                    <button type="button" id="tab-admin" class="tab-btn" style="flex:1;padding:12px 0;border:none;background:#fff;border-bottom:2px solid #eee;font-weight:bold;cursor:pointer;">Войти в админ панель</button>
+                </div>
                 <form id="login-form" class="booking-form">
                     <div class="form-group">
                         <label for="phone">Телефон</label>
@@ -37,10 +41,6 @@
                     <div class="form-group">
                         <label for="password">Пароль</label>
                         <input type="password" id="password" name="password" required minlength="6" placeholder="Введите пароль">
-                    </div>
-                    <div class="form-group">
-                        <input type="checkbox" id="admin-mode" name="admin-mode" style="margin-right:8px;">
-                        <label for="admin-mode" style="display:inline;font-weight:normal;">Войти как администратор</label>
                     </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn">Войти</button>
