@@ -78,4 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    const nameInput = document.getElementById('name');
+    if (nameInput) {
+        nameInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^А-Яа-яA-Za-zЁё\s]/g, '');
+            if (this.value.length > 40) {
+                this.value = this.value.slice(0, 40);
+            }
+        });
+    }
 }); 
