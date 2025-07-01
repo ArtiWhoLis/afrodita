@@ -673,4 +673,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // --- Инициализация ---
     addExportButtons();
+    // --- Глобальный fetch с обработкой 401 ---
+    const origFetch = window.fetch;
+    window.fetch = async function(url, opts) {
+        const res = await origFetch(url, opts);
+        if (res.status === 401) {
+            localStorage.removeItem('adminToken');
+            showNotice('Сессия истекла или нет доступа. Войдите заново.', true);
+            setTimeout(() => { location.reload(); }, 1200);
+        }
+        return res;
+    };
 }); 
