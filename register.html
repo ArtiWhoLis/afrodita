@@ -29,7 +29,7 @@
         </section>
         <section class="booking-form-section visible">
             <div class="container">
-                <form id="register-form" class="booking-form">
+                <form id="register-form" class="booking-form animated">
                     <div class="form-group">
                         <label for="fio">ФИО</label>
                         <input type="text" id="fio" name="fio" required maxlength="100" placeholder="Введите ФИО">
@@ -41,7 +41,10 @@
                     </div>
                     <div class="form-group">
                         <label for="password">Пароль</label>
-                        <input type="password" id="password" name="password" required minlength="6" placeholder="Введите пароль">
+                        <div style="position:relative;">
+                            <input type="password" id="password" name="password" required minlength="6" placeholder="Введите пароль" style="padding-right:40px;">
+                            <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1em;color:#d17a97;"></button>
+                        </div>
                     </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn">Зарегистрироваться</button>

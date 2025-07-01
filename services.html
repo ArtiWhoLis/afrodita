@@ -6,6 +6,93 @@
     <title>Услуги - Салон красоты "Афродита"</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3208/3208707.png">
+    <style>
+        .services-hero {
+            background: linear-gradient(120deg, #e9c1d0 0%, #bfa6b8 100%);
+            color: #fff;
+            padding: 48px 0 32px 0;
+            text-align: center;
+        }
+        .services-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .services-hero p {
+            font-size: 1.15rem;
+            opacity: 0.92;
+        }
+        .services-list-new {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 32px;
+            margin: 0 auto;
+            max-width: 1100px;
+            padding: 32px 0 48px 0;
+        }
+        .service-card-new {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(209, 122, 151, 0.10);
+            padding: 28px 24px 22px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: box-shadow 0.22s, transform 0.22s;
+            position: relative;
+            min-height: 220px;
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            animation: fadeInUp 0.7s forwards;
+        }
+        .service-card-new .service-img {
+            width: 100%;
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(209, 122, 151, 0.10);
+        }
+        .service-card-new h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.25em;
+            color: #d17a97;
+        }
+        .service-card-new p {
+            margin: 0 0 10px 0;
+            color: #444;
+            font-size: 1em;
+        }
+        .service-card-new .price {
+            font-weight: bold;
+            color: #b96580;
+            margin-bottom: 12px;
+        }
+        .service-card-new .btn {
+            margin-top: auto;
+            align-self: flex-end;
+        }
+        .service-card-new:hover {
+            box-shadow: 0 8px 32px rgba(209, 122, 151, 0.18);
+            transform: translateY(-4px) scale(1.03);
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        @media (max-width: 700px) {
+            .services-list-new {
+                grid-template-columns: 1fr;
+                gap: 18px;
+                padding: 18px 0 32px 0;
+            }
+            .service-card-new {
+                padding: 18px 12px 16px 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -21,48 +108,54 @@
             </nav>
         </div>
     </header>
-
     <main>
-        <section class="page-title fade-in">
+        <section class="services-hero fade-in">
             <div class="container">
                 <h1>Наши услуги</h1>
+                <p>Только современные процедуры и лучшие мастера. Выберите услугу и запишитесь онлайн!</p>
             </div>
         </section>
-
-        <section class="services-list fade-in">
+        <section>
             <div class="container">
-                <div class="service-item">
-                    <img src="https://avatars.dzeninfra.ru/get-zen_doc/271828/pub_685958cf756b684bba354aeb_68596999582ebd65225687ba/scale_1200" alt="Маникюр и педикюр" class="service-img">
-                    <h3>Маникюр и педикюр</h3>
-                    <p>Классический, европейский, аппаратный, SPA-уход. Покрытие гель-лаком, дизайн ногтей любой сложности.</p>
-                    <p class="price">от 1500 руб.</p>
-                </div>
-                <div class="service-item">
-                    <img src="https://i.pinimg.com/originals/a1/98/a6/a198a6033ee11bdd1fdabe5357953249.jpg" alt="Парикмахерские услуги" class="service-img">
-                    <h3>Парикмахерские услуги</h3>
-                    <p>Стрижки (женские, мужские, детские), окрашивание любой сложности, укладки, прически, уход для волос.</p>
-                    <p class="price">от 1000 руб.</p>
-                </div>
-                <div class="service-item">
-                    <img src="https://i.pinimg.com/originals/a5/28/63/a5286387318f310cec15ea5654694b67.png" alt="Косметология" class="service-img">
-                    <h3>Косметология</h3>
-                    <p>Чистка лица, пилинги, маски, уходовые программы по типу кожи, массаж лица.</p>
-                    <p class="price">от 2500 руб.</p>
-                </div>
-                <div class="service-item">
-                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Макияж и брови" class="service-img">
-                    <h3>Макияж и брови</h3>
-                    <p>Дневной, вечерний, свадебный макияж. Коррекция и окрашивание бровей, ламинирование.</p>
-                    <p class="price">от 1200 руб.</p>
-                </div>
+                <div id="services-list" class="services-list-new"></div>
             </div>
         </section>
     </main>
-
     <footer>
         <div class="container">
             <p>&copy; 2025 Салон красоты "Афродита". Все права защищены.</p>
         </div>
     </footer>
+    <script>
+    // Анимация появления карточек с задержкой
+    function animateCards() {
+        const cards = document.querySelectorAll('.service-card-new');
+        cards.forEach((card, i) => {
+            card.style.animationDelay = (0.08 * i) + 's';
+        });
+    }
+    // Динамическая загрузка услуг
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/services')
+            .then(res => res.json())
+            .then(services => {
+                const list = document.getElementById('services-list');
+                if (!Array.isArray(services) || !services.length) {
+                    list.innerHTML = '<div style="text-align:center;color:#888;font-size:1.1em;padding:32px 0;">Пока нет услуг</div>';
+                    return;
+                }
+                list.innerHTML = services.map((s, i) => `
+                    <div class="service-card-new" style="animation-delay:${0.08*i}s;">
+                        ${s.img ? `<img src="${s.img}" alt="${s.name}" class="service-img">` : ''}
+                        <h3>${s.name}</h3>
+                        <p>${s.description || ''}</p>
+                        ${s.price ? `<div class="price">от ${s.price} руб.</div>` : ''}
+                        <a href="booking.html?service=${encodeURIComponent(s.id)}" class="btn">Записаться</a>
+                    </div>
+                `).join('');
+                animateCards();
+            });
+    });
+    </script>
 </body>
 </html> 
