@@ -431,7 +431,7 @@ app.post('/api/requests', roleAuth('user'), async (req, res) => {
     'INSERT INTO requests (name, phone, service, date, time, comment, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
     [fio, phone, service, date, time, comment, userId]
   );
-  res.json({ id: result.rows[0].id, userId });
+  res.json({ id: result.rows[0].id, userId, debug: "test123" });
 });
 
 // Получить всех админов (и мастеров)
