@@ -190,7 +190,12 @@ function adminAuth(req, res, next) {
 // Профиль пользователя
 app.get('/api/profile', auth, async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, fio, phone FROM users WHERE id = $1', [req.userId]);
+    const result = await pool.query(`
+      SELECT u.id, u.fio, u.phone, COALESCE(a.role, 'user') as role
+      FROM users u
+      LEFT JOIN admins a ON a.user_id = u.id
+      WHERE u.id = $1
+    `, [req.userId]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
     res.json(result.rows[0]);
   } catch (err) {
