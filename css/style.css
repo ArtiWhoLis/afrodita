@@ -589,4 +589,29 @@ input[type='search'], .filter-chip {
   .btn, .btn-cancel { width: 100%; font-size: 1.1em; }
   .modal, .booking-form, .admin-table { min-width: 0; width: 100vw; }
   .container { padding: 0 2vw; }
+}
+
+/* --- Современные табы для входа --- */
+.login-tabs {
+  display: flex; gap: 0; margin-bottom: 24px; border-radius: 16px; overflow: hidden; background: #f7f7fa;
+  box-shadow: 0 2px 12px #0001;
+}
+.login-tab {
+  flex: 1; padding: 14px 0; font-size: 1.13em; font-weight: 500; color: #a77;
+  background: none; border: none; outline: none; cursor: pointer;
+  transition: background .22s, color .22s, box-shadow .22s, border .22s;
+  border-radius: 0; border-bottom: 3px solid transparent;
+}
+.login-tab.active, .login-tab:focus {
+  color: #d33; background: #fff; border-bottom: 3px solid #e9b0c9;
+  box-shadow: 0 4px 16px #e9b0c933;
+  border-radius: 16px 16px 0 0;
+  z-index: 2;
+}
+.login-tab:not(.active):hover {
+  background: #f3e6ef; color: #c77;
+}
+@media (max-width: 600px) {
+  .login-tabs { flex-direction: column; border-radius: 18px; }
+  .login-tab { font-size: 1.18em; padding: 16px 0; }
 } 

@@ -34,11 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await res.json();
             if (res.ok && data.token && data.role === 'admin') {
                 localStorage.setItem('adminToken', data.token);
-                location.reload();
+                window.location.href = 'admin.html';
             } else {
                 document.getElementById('login-error').textContent = data.error || 'Ошибка входа';
             }
         });
+    }
+    // --- Скелетон на время проверки токена ---
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel && adminPanel.style.display !== '') {
+        adminPanel.innerHTML = '<div class="skeleton" style="height:180px;margin:40px 0 0 0;"></div>';
     }
     // --- Если уже авторизован ---
     (async function() {
