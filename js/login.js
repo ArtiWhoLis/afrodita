@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     data = await res.json();
                     if (!res.ok) throw new Error(data.error || 'Ошибка входа администратора');
                     localStorage.setItem('adminToken', data.token);
-                    window.location.href = 'admin-panel.html';
+                    window.location.href = 'admin.html';
                 } else {
                     // Обычный пользователь
                     res = await fetch('/api/login', {
