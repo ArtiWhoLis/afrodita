@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminLogin = document.getElementById('admin-login');
     const adminRequests = document.getElementById('admin-requests');
     // --- Авторизация ---
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
     let role = null;
     // Проверяем роль через /api/profile и /api/my-requests (или отдельный endpoint)
     async function checkAdmin() {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const data = await res.json();
             if (res.ok && data.token && data.role === 'admin') {
-                localStorage.setItem('token', data.token);
+                localStorage.setItem('adminToken', data.token);
                 location.reload();
             } else {
                 document.getElementById('login-error').textContent = data.error || 'Ошибка входа';

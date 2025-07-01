@@ -122,17 +122,32 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Админ-логин (жёстко заданные логин и пароль)
-const ADMIN_LOGIN = 'anton';
-const ADMIN_PASSWORD = '123456';
-
-app.post('/api/admin/login', (req, res) => {
+// Админ-логин (по таблице users и admins)
+app.post('/api/admin/login', async (req, res) => {
   const { login, password } = req.body;
-  if (login === ADMIN_LOGIN && password === ADMIN_PASSWORD) {
-    const token = jwt.sign({ admin: true }, SECRET, { expiresIn: '7d' });
-    return res.json({ token });
+  if (!login || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' });
   }
-  res.status(401).json({ error: 'Неверный логин или пароль администратора' });
+  try {
+    // Найти пользователя с таким логином (phone) и ролью admin
+    const userRes = await pool.query(
+      `SELECT u.*, a.role FROM users u
+       JOIN admins a ON a.user_id = u.id
+       WHERE u.phone = $1 AND a.role = 'admin'`, [login]
+    );
+    if (userRes.rows.length === 0) {
+      return res.status(401).json({ error: 'Пользователь не найден' });
+    }
+    const user = userRes.rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ error: 'Неверный пароль' });
+    }
+    const token = jwt.sign({ id: user.id, admin: true }, SECRET, { expiresIn: '7d' });
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Middleware для проверки токена
