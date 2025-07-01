@@ -8,30 +8,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const masterInfo = document.getElementById('master-info');
     const tbody = document.getElementById('requests-body');
-    // Получить профиль мастера
+    // Получить профиль мастера и его должность
     fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
         .then(res => res.ok ? res.json() : null)
-        .then(user => {
+        .then(async user => {
             if (!user) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
                 return;
             }
-            // Получить должность мастера
-            fetch('/api/masters', { headers: { 'Authorization': 'Bearer ' + token } })
-                .then(res => res.json())
-                .then(masters => {
-                    const m = (masters || []).find(m => m.user_id === user.id);
-                    masterInfo.innerHTML = `<b>${user.fio}</b> <span style='color:#888;'>(${m ? m.position : 'Мастер'})</span>`;
-                });
+            // Получить должность из masters (по user_id), если есть доступ
+            let position = 'Мастер';
+            try {
+                const res = await fetch('/api/my-master', { headers: { 'Authorization': 'Bearer ' + token } });
+                if (res.ok) {
+                    const m = await res.json();
+                    if (m && m.position) position = m.position;
+                }
+            } catch {}
+            masterInfo.innerHTML = `<b>${user.fio}</b> <span style='color:#888;'>(${position})</span>`;
         });
     // Загрузить заявки мастера
     async function loadRequests() {
         tbody.innerHTML = '<tr><td colspan="6">Загрузка...</td></tr>';
-        const res = await fetch('/api/my-requests', { headers: { 'Authorization': 'Bearer ' + token } });
-        const data = await res.json();
-        window._allRequests = data;
-        renderRequests(data);
+        try {
+            const res = await fetch('/api/my-requests', { headers: { 'Authorization': 'Bearer ' + token } });
+            if (!res.ok) throw new Error('Ошибка загрузки заявок');
+            const data = await res.json();
+            window._allRequests = Array.isArray(data) ? data : [];
+            renderRequests(window._allRequests);
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="6">Ошибка загрузки</td></tr>';
+        }
     }
     function renderRequests(requests) {
         if (!requests.length) {
@@ -66,4 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (el) el.oninput = filterRequests;
     });
     loadRequests();
-}); 
+});
+
+// Новый эндпоинт /api/my-master должен возвращать { position } для текущего мастера (или пусто) 

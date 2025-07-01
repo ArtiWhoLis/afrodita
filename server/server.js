@@ -514,6 +514,13 @@ app.get('/api/master-services', roleAuth('admin'), async (req, res) => {
   res.json(result.rows);
 });
 
+// Получить должность мастера для текущего пользователя
+app.get('/api/my-master', roleAuth('user'), async (req, res) => {
+  const result = await pool.query('SELECT id, position FROM masters WHERE user_id = $1', [req.userId]);
+  if (result.rows.length === 0) return res.json({});
+  res.json(result.rows[0]);
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 }); 
