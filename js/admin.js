@@ -673,14 +673,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // --- Инициализация ---
     addExportButtons();
-    // --- Глобальный fetch с обработкой 401 ---
+    // --- Глобальный fetch с обработкой 401 и логированием ---
     const origFetch = window.fetch;
     window.fetch = async function(url, opts) {
         const res = await origFetch(url, opts);
         if (res.status === 401) {
+            const token = localStorage.getItem('adminToken');
+            let decoded = '';
+            try {
+                if (token) {
+                    const payload = token.split('.')[1];
+                    decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+                }
+            } catch (e) { decoded = 'Ошибка декодирования токена'; }
+            console.warn('[ADMIN] 401 Unauthorized! Токен:', token, '\nPayload:', decoded, '\nОтвет:', res);
             localStorage.removeItem('adminToken');
-            showNotice('Сессия истекла или нет доступа. Войдите заново.', true);
-            setTimeout(() => { location.reload(); }, 1200);
+            showNotice('Сессия истекла или нет доступа. Войдите заново.\n' + (decoded ? 'Токен: ' + decoded : ''), true);
+            setTimeout(() => { location.reload(); }, 2200);
         }
         return res;
     };
