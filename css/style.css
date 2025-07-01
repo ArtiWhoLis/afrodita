@@ -341,8 +341,8 @@ footer {
 
 /* Анимации появления */
 .fade-in {
-    opacity: 0;
-    transform: translateY(40px);
+    opacity: 1;
+    transform: none;
     transition: opacity 0.8s, transform 0.8s;
 }
 .fade-in.visible {

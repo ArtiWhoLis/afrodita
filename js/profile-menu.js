@@ -33,11 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Выпадающее меню
                 const btn = document.getElementById('profileBtn');
                 const dropdown = document.getElementById('profileDropdown');
-                btn.onclick = (e) => {
+                btn.addEventListener('click', function(e) {
                   e.stopPropagation();
                   dropdown.classList.toggle('open');
-                };
-                document.body.addEventListener('click', () => dropdown.classList.remove('open'));
+                });
+                document.body.addEventListener('click', function(e) {
+                  // Не закрывать, если клик по кнопке
+                  if (e.target === btn || btn.contains(e.target)) return;
+                  dropdown.classList.remove('open');
+                });
                 // Выход
                 document.getElementById('logoutLink').onclick = (e) => {
                   e.preventDefault();
