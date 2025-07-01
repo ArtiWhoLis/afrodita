@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const actions = document.getElementById('header-actions');
     if (!actions) return;
     const token = localStorage.getItem('token');
+    function showAuthButtons() {
+        actions.innerHTML = `
+          <a href="booking.html" class="btn">Записаться онлайн</a>
+          <a href="login.html" class="btn btn-secondary">Вход</a>
+        `;
+    }
     if (token) {
         // Получаем имя пользователя
         fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
@@ -13,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!user) throw new Error();
                 actions.innerHTML = `
                   <div class="profile-menu">
-                    <button class="profile-btn" id="profileBtn">
+                    <button class="profile-btn" id="profileBtn" type="button">
                       <span class="profile-avatar">${user.fio[0] || '?'}</span>
                       <span class="profile-name">${user.fio.split(' ')[0]}</span>
                       <svg class="profile-arrow" width="16" height="16" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" stroke="#888" stroke-width="2" fill="none"/></svg>
@@ -41,12 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(() => {
                 localStorage.removeItem('token');
-                window.location.href = 'login.html';
+                showAuthButtons();
             });
     } else {
-        actions.innerHTML = `
-          <a href="booking.html" class="btn">Записаться онлайн</a>
-          <a href="login.html" class="btn btn-secondary">Вход</a>
-        `;
+        showAuthButtons();
     }
 }); 

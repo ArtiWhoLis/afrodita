@@ -671,12 +671,19 @@ input[type='search'], .filter-chip {
     border-radius: 12px;
     box-shadow: 0 4px 24px rgba(209,122,151,0.13);
     min-width: 140px;
-    z-index: 100;
+    z-index: 9999;
     padding: 8px 0;
     animation: fadeInBg 0.2s;
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 0.18s;
 }
 .profile-dropdown.open {
     display: block;
+    opacity: 1;
+}
+.profile-btn:active {
+    background: #f7e3ea;
 }
 .profile-dropdown a {
     display: block;
