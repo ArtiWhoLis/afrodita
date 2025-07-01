@@ -344,6 +344,16 @@ app.post('/api/requests', roleAuth('user'), async (req, res) => {
   res.json({ id: result.rows[0].id });
 });
 
+// Получить всех админов (и мастеров)
+app.get('/api/admins', roleAuth('admin'), async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM admins ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 }); 
