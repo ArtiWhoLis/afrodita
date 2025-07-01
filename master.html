@@ -33,6 +33,7 @@
                 <div style="margin-bottom:18px;display:flex;gap:16px;align-items:center;">
                     <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
                     <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                    <button id="copy-log-btn" style="padding:6px 14px;border-radius:4px;border:1px solid #d17a97;background:#fff;color:#d17a97;cursor:pointer;">Копировать лог</button>
                 </div>
                 <table class="admin-table">
                     <thead>
@@ -56,5 +57,15 @@
         </div>
     </footer>
     <script src="js/master.js"></script>
+    <script>
+    document.getElementById('copy-log-btn').onclick = function() {
+        const data = window._allRequests || [];
+        const text = JSON.stringify(data, null, 2);
+        navigator.clipboard.writeText(text).then(() => {
+            this.textContent = 'Скопировано!';
+            setTimeout(() => { this.textContent = 'Копировать лог'; }, 1500);
+        });
+    };
+    </script>
 </body>
 </html> 
