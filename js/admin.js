@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminLogin = document.getElementById('admin-login');
     const adminRequests = document.getElementById('admin-requests');
     // --- Авторизация ---
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     let role = null;
     // Проверяем роль через /api/profile и /api/my-requests (или отдельный endpoint)
     async function checkAdmin() {
@@ -46,6 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (adminLogin) adminLogin.style.display = 'none';
             const adminPanel = document.getElementById('admin-panel');
             if (adminPanel) adminPanel.style.display = '';
+            // Кнопка выхода
+            let logoutBtn = document.getElementById('admin-logout-btn');
+            if (!logoutBtn) {
+                logoutBtn = document.createElement('button');
+                logoutBtn.id = 'admin-logout-btn';
+                logoutBtn.textContent = 'Выйти';
+                logoutBtn.className = 'btn-cancel';
+                logoutBtn.style = 'position:absolute;top:20px;right:30px;z-index:10;';
+                adminPanel.parentNode.insertBefore(logoutBtn, adminPanel);
+                logoutBtn.onclick = function() {
+                    localStorage.removeItem('adminToken');
+                    location.reload();
+                };
+            }
             // Вкладки
             const tabs = document.querySelectorAll('.admin-tab');
             const tabContents = document.querySelectorAll('.admin-tab-content');
@@ -64,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (adminLogin) adminLogin.style.display = '';
             const adminPanel = document.getElementById('admin-panel');
             if (adminPanel) adminPanel.style.display = 'none';
+            // Удаляем кнопку выхода, если есть
+            const logoutBtn = document.getElementById('admin-logout-btn');
+            if (logoutBtn) logoutBtn.remove();
         }
     })();
     // --- Дальнейшая логика: вкладки, загрузка данных, CRUD ---
