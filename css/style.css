@@ -789,4 +789,49 @@ input[type='search'], .filter-chip {
 select.error, input.error {
     border: 2px solid #d33 !important;
     background: #fff0f0;
+}
+
+/* --- Современные табы для админ-панели --- */
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f7e3ea;
+  box-shadow: 0 2px 12px #e9b0c933;
+  justify-content: flex-start;
+  padding: 4px;
+}
+.admin-tab {
+  flex: 1;
+  padding: 13px 0 13px 0;
+  font-size: 1.13em;
+  font-weight: 500;
+  color: #a77;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: background .22s, color .22s, box-shadow .22s, border .22s;
+  border-radius: 22px;
+  margin: 0 6px;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+.admin-tab.active, .admin-tab:focus {
+  color: #fff;
+  background: linear-gradient(90deg, #e9b0c9 0%, #f7b6d2 100%);
+  border-bottom: 3px solid #d17a97;
+  box-shadow: 0 4px 16px #e9b0c933;
+  border-radius: 22px;
+  z-index: 2;
+}
+.admin-tab:not(.active):hover {
+  background: #f3e6ef;
+  color: #c77;
+}
+@media (max-width: 600px) {
+  .admin-tabs { flex-direction: column; border-radius: 18px; }
+  .admin-tab { font-size: 1.18em; padding: 16px 0; margin: 4px 0; }
 } 

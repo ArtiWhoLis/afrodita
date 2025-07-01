@@ -506,6 +506,14 @@ app.post('/api/users/:id/reset-password', roleAuth('admin'), async (req, res) =>
   res.json({ ok: true });
 });
 
+// Получить все услуги мастера по master_id
+app.get('/api/master-services', roleAuth('admin'), async (req, res) => {
+  const { master_id } = req.query;
+  if (!master_id) return res.status(400).json({ error: 'master_id обязателен' });
+  const result = await pool.query('SELECT * FROM master_services WHERE master_id = $1', [master_id]);
+  res.json(result.rows);
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 }); 
