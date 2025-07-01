@@ -408,9 +408,12 @@ app.get('/api/my-requests', roleAuth('user'), async (req, res) => {
 
 // --- Изменение создания заявки: только для авторизованных, user_id ---
 app.post('/api/requests', roleAuth('user'), async (req, res) => {
+  console.log('TOKEN userId:', req.userId, 'body.user_id:', req.body.user_id, 'body:', req.body);
+  let userId = req.userId;
+  if (!userId && req.body.user_id) userId = req.body.user_id; // временный костыль
   const { service, date, time, comment } = req.body;
   // Получаем профиль пользователя
-  const userRes = await pool.query('SELECT fio, phone FROM users WHERE id = $1', [req.userId]);
+  const userRes = await pool.query('SELECT fio, phone FROM users WHERE id = $1', [userId]);
   if (userRes.rows.length === 0) return res.status(400).json({ error: 'Пользователь не найден' });
   const { fio, phone } = userRes.rows[0];
   if (!service || !date || !time) {
@@ -426,7 +429,7 @@ app.post('/api/requests', roleAuth('user'), async (req, res) => {
   }
   const result = await pool.query(
     'INSERT INTO requests (name, phone, service, date, time, comment, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-    [fio, phone, service, date, time, comment, req.userId]
+    [fio, phone, service, date, time, comment, userId]
   );
   res.json({ id: result.rows[0].id });
 });

@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ service: Number(service), date, time, name: fio, phone, comment })
+                body: JSON.stringify({ service: Number(service), date, time, name: fio, phone, comment, user_id: userProfile && userProfile.id ? userProfile.id : undefined })
             })
             .then(res => res.json())
             .then(data => {
