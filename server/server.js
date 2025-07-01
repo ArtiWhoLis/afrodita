@@ -384,27 +384,29 @@ app.post('/api/role-login', async (req, res) => {
 app.get('/api/my-requests', roleAuth('user'), async (req, res) => {
   const role = req.role;
   if (role === 'admin') {
-    // Все заявки
     const result = await pool.query('SELECT * FROM requests ORDER BY id DESC');
     return res.json(result.rows);
   } else if (role === 'master') {
     // Мастер: все заявки по его услугам
     const masterRes = await pool.query('SELECT id FROM masters WHERE user_id = $1', [req.userId]);
-    if (masterRes.rows.length === 0) return res.json([]);
+    if (masterRes.rows.length === 0) {
+      console.log('[MASTER REQUESTS] Нет master_id для userId', req.userId);
+      return res.json([]);
+    }
     const masterId = masterRes.rows[0].id;
-    // Получаем услуги мастера
     const servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
     const serviceIds = servRes.rows.map(r => String(r.service_id));
-    if (serviceIds.length === 0) return res.json([]);
+    if (serviceIds.length === 0) {
+      console.log('[MASTER REQUESTS] Нет услуг для masterId', masterId);
+      return res.json([]);
+    }
     // Лог для отладки
     console.log('[MASTER REQUESTS]', { userId: req.userId, masterId, serviceIds });
-    // Заявки на эти услуги (строго по строке)
     const result = await pool.query('SELECT * FROM requests WHERE service::text = ANY($1) ORDER BY id DESC', [serviceIds]);
     // Лог результата
     console.log('[MASTER REQUESTS RESULT]', result.rows.map(r => ({id: r.id, user_id: r.user_id, service: r.service})));
     return res.json(result.rows);
   } else {
-    // Только свои заявки
     const result = await pool.query('SELECT * FROM requests WHERE user_id = $1 ORDER BY id DESC', [req.userId]);
     return res.json(result.rows);
   }
