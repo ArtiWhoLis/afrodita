@@ -354,6 +354,17 @@ app.get('/api/admins', roleAuth('admin'), async (req, res) => {
   }
 });
 
+// Получить пользователя по id
+app.get('/api/users/:id', roleAuth('admin'), async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, fio, phone FROM users WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 }); 
