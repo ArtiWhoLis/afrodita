@@ -19,23 +19,7 @@
                     <li><a href="contacts.html">Контакты</a></li>
                 </ul>
             </nav>
-            <div class="profile-panel" id="profilePanel">
-                <div class="profile-panel__trigger" id="profilePanelTrigger">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Аватар" class="profile-panel__avatar" id="profilePanelAvatar">
-                    <span class="profile-panel__fio" id="profilePanelFio">Тоша Соловьёв</span>
-                    <svg class="profile-panel__arrow" width="16" height="16" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" stroke="#888" stroke-width="2" fill="none"/></svg>
-                </div>
-                <div class="profile-panel__dropdown" id="profilePanelDropdown">
-                    <div class="profile-panel__user">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Аватар" class="profile-panel__avatar-lg" id="profilePanelAvatarLg">
-                        <div class="profile-panel__fio-lg" id="profilePanelFioLg">Тоша Соловьёв</div>
-                        <div class="profile-panel__phone" id="profilePanelPhone">+7 ••• ••• •• 17</div>
-                    </div>
-                    <a href="#" class="profile-panel__action">Профиль</a>
-                    <a href="#" class="profile-panel__action" id="profilePanelLogout">Выйти</a>
-                    <div class="profile-panel__divider"></div>
-                </div>
-            </div>
+            <div id="profilePanelWrap"></div>
         </div>
     </header>
 
@@ -146,13 +130,42 @@
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const headerRight = document.getElementById('profilePanelWrap');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Не авторизован — показать кнопку Войти
+            const loginBtn = document.createElement('a');
+            loginBtn.href = 'login.html';
+            loginBtn.className = 'btn';
+            loginBtn.textContent = 'Войти';
+            headerRight.appendChild(loginBtn);
+            return;
+        }
+        // Авторизован — вставить профиль-меню
+        headerRight.innerHTML = `
+        <div class="profile-panel" id="profilePanel">
+            <div class="profile-panel__trigger" id="profilePanelTrigger">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Аватар" class="profile-panel__avatar" id="profilePanelAvatar">
+                <span class="profile-panel__fio" id="profilePanelFio">Профиль</span>
+                <svg class="profile-panel__arrow" width="16" height="16" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" stroke="#888" stroke-width="2" fill="none"/></svg>
+            </div>
+            <div class="profile-panel__dropdown" id="profilePanelDropdown">
+                <div class="profile-panel__user">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Аватар" class="profile-panel__avatar-lg" id="profilePanelAvatarLg">
+                    <div class="profile-panel__fio-lg" id="profilePanelFioLg">Профиль</div>
+                    <div class="profile-panel__phone" id="profilePanelPhone">+7 ••• ••• •• 17</div>
+                </div>
+                <a href="profile.html" class="profile-panel__action">Профиль</a>
+                <a href="#" class="profile-panel__action" id="profilePanelLogout">Выйти</a>
+            </div>
+        </div>`;
+        // Логика меню
         const trigger = document.getElementById('profilePanelTrigger');
         const dropdown = document.getElementById('profilePanelDropdown');
         const panel = document.getElementById('profilePanel');
         const fioSpan = document.getElementById('profilePanelFio');
         const fioLg = document.getElementById('profilePanelFioLg');
         const phone = document.getElementById('profilePanelPhone');
-        const profileBtn = document.querySelector('.profile-panel__action[href="profile.html"], .profile-panel__action:not([id])');
         let open = false;
         function setDropdownState(state) {
             open = state;
@@ -163,7 +176,6 @@
                 let left = rect.left;
                 let top = rect.bottom + 6;
                 let minWidth = rect.width + 80;
-                // Проверка выхода за правый край
                 const dropdownWidth = Math.max(dropdown.offsetWidth, minWidth, 220);
                 if (left + dropdownWidth > window.innerWidth - 12) {
                     left = window.innerWidth - dropdownWidth - 12;
@@ -197,20 +209,14 @@
             window.location.href = 'login.html';
         };
         // Подгружаем профиль
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
-                .then(res => res.ok ? res.json() : null)
-                .then(user => {
-                    if (!user) return;
-                    fioSpan.textContent = user.fio;
-                    fioLg.textContent = user.fio;
-                    phone.textContent = user.phone.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ••• ••• •• $5');
-                });
-        }
-        if (profileBtn) {
-            profileBtn.setAttribute('href', 'profile.html');
-        }
+        fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.ok ? res.json() : null)
+            .then(user => {
+                if (!user) return;
+                fioSpan.textContent = user.fio;
+                fioLg.textContent = user.fio;
+                phone.textContent = user.phone.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ••• ••• •• $5');
+            });
     });
     </script>
 </body>
