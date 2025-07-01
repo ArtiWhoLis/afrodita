@@ -681,6 +681,13 @@ input[type='search'], .filter-chip {
     display: block !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    background: #d33 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+    box-shadow: 0 0 24px 8px #d33a !important;
+    z-index: 99999 !important;
+    min-width: 180px !important;
+    font-size: 1.2em !important;
 }
 .profile-btn:active {
     background: #f7e3ea;
