@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
-    // if (!token) {
-    //     window.location.href = 'login.html';
-    //     return;
-    // }
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
     const bookingForm = document.getElementById('booking-form');
     const formMessage = document.getElementById('form-message');
     const profileFio = document.getElementById('profile-fio');
@@ -55,6 +55,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         bookingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            if (!token) {
+                formMessage.textContent = 'Авторизуйтесь для записи.';
+                formMessage.style.color = 'red';
+                return;
+            }
             formMessage.textContent = '';
             const service = serviceSelect ? serviceSelect.value : '';
             const date = dateInput ? dateInput.value : '';
