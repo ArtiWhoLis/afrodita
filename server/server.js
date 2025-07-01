@@ -396,8 +396,8 @@ app.get('/api/my-requests', roleAuth('user'), async (req, res) => {
     const servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
     const serviceIds = servRes.rows.map(r => r.service_id);
     if (serviceIds.length === 0) return res.json([]);
-    // Заявки на эти услуги
-    const result = await pool.query('SELECT * FROM requests WHERE service = ANY($1::int[]) ORDER BY id DESC', [serviceIds]);
+    // Заявки на эти услуги (сравниваем как строки)
+    const result = await pool.query('SELECT * FROM requests WHERE service::text = ANY($1::text[]) ORDER BY id DESC', [serviceIds.map(String)]);
     return res.json(result.rows);
   } else {
     // Только свои заявки
