@@ -669,6 +669,52 @@ input[type='search'], .filter-chip {
     transform: rotate(180deg);
 }
 
+.profile-panel__dropdown {
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-width: 220px;
+    max-width: 320px;
+    width: 100%;
+    background: #232324;
+    color: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px #0005, 0 1.5px 8px #0002;
+    padding: 18px 0 8px 0;
+    opacity: 1;
+    display: none;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    z-index: 9999;
+}
+.profile-panel__user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.profile-panel__avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #444;
+    margin-bottom: 8px;
+}
+.profile-panel__fio-lg {
+    font-size: 1.08em;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: #fff;
+    text-align: center;
+}
+.profile-panel__phone {
+    color: #aaa;
+    font-size: 1em;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
 /* Header actions (right) */
 .header-actions {
     display: flex;
@@ -716,4 +762,26 @@ input[type='search'], .filter-chip {
 @media (max-width: 700px) {
   .nav-flex { flex-direction: column; align-items: stretch; gap: 10px; }
   .main-nav ul { flex-direction: column; gap: 8px; }
+}
+
+.profile-panel__action {
+    display: block;
+    width: 90%;
+    margin: 0 auto 10px auto;
+    padding: 12px 0;
+    color: #fff;
+    font-size: 1.08em;
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.18s, color 0.18s;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+.profile-panel__action:hover, .profile-panel__action:focus {
+    background: #f7e3ea;
+    color: #d17a97;
 } 

@@ -142,122 +142,7 @@
     <script src="js/script.js"></script>
     <script src="js/enhance.js"></script>
     <style>
-    .profile-panel {
-        position: relative;
-        display: flex;
-        align-items: center;
-        margin: 40px;
-        z-index: 1001;
-    }
-    .profile-panel__trigger {
-        display: flex;
-        align-items: center;
-        background: #232324;
-        color: #fff;
-        border-radius: 32px;
-        padding: 10px 28px 10px 10px;
-        cursor: pointer;
-        gap: 10px;
-        font-weight: 500;
-        font-size: 1.18em;
-        box-shadow: 0 2px 8px #0002;
-        border: none;
-        transition: background 0.18s;
-    }
-    .profile-panel__trigger:hover, .profile-panel__trigger:focus {
-        background: #18181a;
-    }
-    .profile-panel__avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #444;
-        margin-right: 8px;
-    }
-    .profile-panel__fio {
-        color: #fff;
-        font-weight: 700;
-        margin-right: 4px;
-        white-space: nowrap;
-    }
-    .profile-panel__arrow {
-        margin-left: 2px;
-        transition: transform 0.2s;
-        fill: #888;
-    }
-    .profile-panel.open .profile-panel__arrow {
-        transform: rotate(180deg);
-    }
-    .profile-panel__dropdown {
-        position: fixed;
-        left: 0;
-        top: 0;
-        min-width: 320px;
-        background: #232324;
-        color: #fff;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px #0005, 0 1.5px 8px #0002;
-        padding: 18px 0 8px 0;
-        opacity: 1;
-        display: none;
-        pointer-events: auto;
-        transform: translateY(0) scale(1);
-        z-index: 9999;
-    }
-    .profile-panel.open .profile-panel__dropdown {
-        display: block;
-    }
-    .profile-panel__user {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-    .profile-panel__avatar-lg {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #444;
-        margin-bottom: 8px;
-    }
-    .profile-panel__fio-lg {
-        font-size: 1.18em;
-        font-weight: bold;
-        margin-bottom: 2px;
-        color: #fff;
-    }
-    .profile-panel__phone {
-        color: #aaa;
-        font-size: 1em;
-        margin-bottom: 8px;
-    }
-    .profile-panel__action {
-        display: flex;
-        align-items: center;
-        padding: 12px 28px;
-        color: #fff;
-        font-size: 1.08em;
-        text-decoration: none;
-        border: none;
-        background: none;
-        cursor: pointer;
-        border-radius: 10px;
-        transition: background 0.15s, color 0.15s;
-        gap: 10px;
-    }
-    .profile-panel__action:hover {
-        background: #18181a;
-        color: #d17a97;
-    }
-    .profile-panel__divider {
-        height: 1px;
-        background: #333;
-        margin: 8px 0 8px 0;
-        width: 90%;
-        margin-left: 5%;
-    }
+    /* Удалены дублирующие стили profile-panel, теперь используется только css/style.css */
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -275,9 +160,19 @@
             dropdown.style.display = open ? 'block' : 'none';
             if (open) {
                 const rect = trigger.getBoundingClientRect();
-                dropdown.style.left = rect.left + 'px';
-                dropdown.style.top = (rect.bottom + 6) + 'px';
-                dropdown.style.minWidth = rect.width + 80 + 'px';
+                let left = rect.left;
+                let top = rect.bottom + 6;
+                let minWidth = rect.width + 80;
+                // Проверка выхода за правый край
+                const dropdownWidth = Math.max(dropdown.offsetWidth, minWidth, 220);
+                if (left + dropdownWidth > window.innerWidth - 12) {
+                    left = window.innerWidth - dropdownWidth - 12;
+                    if (left < 12) left = 12;
+                }
+                dropdown.style.left = left + 'px';
+                dropdown.style.top = top + 'px';
+                dropdown.style.minWidth = minWidth + 'px';
+                dropdown.style.maxWidth = '320px';
             }
         }
         setDropdownState(false);
