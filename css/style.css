@@ -663,6 +663,10 @@ input[type='search'], .filter-chip {
     transition: transform 0.2s;
 }
 .profile-dropdown {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.18s;
     position: absolute;
     right: 0;
     top: 110%;
@@ -672,16 +676,11 @@ input[type='search'], .filter-chip {
     min-width: 140px;
     z-index: 9999;
     padding: 8px 0;
-    animation: fadeInBg 0.2s;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.18s;
-    display: none;
 }
 .profile-dropdown.open {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 .profile-btn:active {
     background: #f7e3ea;
