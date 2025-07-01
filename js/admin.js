@@ -489,6 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form id="admin-form">
                     <div class="form-group">
                         <label>Пользователь</label>
+                        <input type="text" id="user-search" placeholder="Поиск по ФИО/телефону" style="width:100%;margin-bottom:6px;">
                         <select name="user_id" required style="width:100%;">
                             <option value="">Выберите пользователя</option>
                             ${users.map(u => `<option value="${u.id}"${u.id == admin.user_id ? ' selected' : ''}>${u.fio} (${u.phone})</option>`).join('')}
@@ -503,11 +504,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn">${mode === 'edit' ? 'Сохранить' : 'Добавить'}</button>
+                        ${mode === 'edit' ? `<button type="button" id="reset-password-btn" class="btn-cancel" style="margin-left:10px;">Сбросить пароль</button>` : ''}
+                        ${mode === 'edit' ? `<button type="button" id="show-audit-btn" class="btn" style="margin-left:10px;">История</button>` : ''}
                     </div>
                 </form>
             </div>
         `;
         document.getElementById('close-admin-modal').onclick = () => { modal.style.display = 'none'; };
+        // Поиск по пользователям
+        const userSearch = document.getElementById('user-search');
+        const userSelect = modal.querySelector('select[name="user_id"]');
+        userSearch.oninput = () => filterUserOptions(userSearch, userSelect);
+        // Сброс пароля
+        if (mode === 'edit') {
+            document.getElementById('reset-password-btn').onclick = async () => {
+                const newPassword = prompt('Введите новый пароль для пользователя (мин. 6 символов):');
+                if (!newPassword || newPassword.length < 6) return alert('Пароль слишком короткий');
+                await safeAction(async () => {
+                    await fetch(`/api/users/${admin.user_id}/reset-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ newPassword })
+                    });
+                }, () => showNotice('Пароль сброшен!'));
+            };
+            // История изменений
+            document.getElementById('show-audit-btn').onclick = () => showAuditLog('admin', id);
+        }
         document.getElementById('admin-form').onsubmit = async function(e) {
             e.preventDefault();
             const user_id = this.user_id.value;
@@ -587,4 +610,67 @@ document.addEventListener('DOMContentLoaded', function() {
     // ... (все CRUD-операции обернуть в safeAction)
     // --- При открытии страницы по умолчанию активировать первую вкладку и загрузить данные ---
     activateTab('requests');
+    // --- Кнопки экспорта ---
+    function addExportButtons() {
+        const requestsTab = document.getElementById('tab-requests');
+        if (requestsTab && !document.getElementById('export-requests-btn')) {
+            const btn = document.createElement('button');
+            btn.id = 'export-requests-btn';
+            btn.className = 'btn';
+            btn.textContent = 'Экспорт заявок (CSV)';
+            btn.style = 'margin-bottom:12px;float:right;';
+            btn.onclick = () => window.open('/api/export/requests', '_blank');
+            requestsTab.prepend(btn);
+        }
+        const usersTab = document.getElementById('tab-admins');
+        if (usersTab && !document.getElementById('export-users-btn')) {
+            const btn = document.createElement('button');
+            btn.id = 'export-users-btn';
+            btn.className = 'btn';
+            btn.textContent = 'Экспорт пользователей (CSV)';
+            btn.style = 'margin-bottom:12px;float:right;';
+            btn.onclick = () => window.open('/api/export/users', '_blank');
+            usersTab.prepend(btn);
+        }
+        const servicesTab = document.getElementById('tab-services');
+        if (servicesTab && !document.getElementById('export-services-btn')) {
+            const btn = document.createElement('button');
+            btn.id = 'export-services-btn';
+            btn.className = 'btn';
+            btn.textContent = 'Экспорт услуг (CSV)';
+            btn.style = 'margin-bottom:12px;float:right;';
+            btn.onclick = () => window.open('/api/export/services', '_blank');
+            servicesTab.prepend(btn);
+        }
+    }
+    // --- Поиск по пользователям в выпадающем списке ---
+    function filterUserOptions(input, select) {
+        const val = input.value.trim().toLowerCase();
+        Array.from(select.options).forEach(opt => {
+            if (!opt.value) return;
+            opt.style.display = (opt.textContent.toLowerCase().includes(val)) ? '' : 'none';
+        });
+    }
+    // --- Модальное окно истории изменений (audit log) ---
+    async function showAuditLog(entity, entityId) {
+        const modal = document.createElement('div');
+        modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0005;z-index:9999;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `<div style="background:#fff;padding:24px 32px;max-width:700px;width:100%;border-radius:12px;max-height:90vh;overflow:auto;position:relative;">
+            <button id="close-audit-modal" style="position:absolute;top:8px;right:12px;font-size:1.3em;background:none;border:none;">×</button>
+            <h2 style="margin-top:0;">История изменений (${entity} #${entityId})</h2>
+            <div id="audit-log-body">Загрузка...</div>
+        </div>`;
+        document.body.appendChild(modal);
+        document.getElementById('close-audit-modal').onclick = () => modal.remove();
+        const res = await fetch(`/api/audit-log?entity=${entity}&entityId=${entityId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        const data = await res.json();
+        const body = document.getElementById('audit-log-body');
+        if (!Array.isArray(data) || !data.length) {
+            body.innerHTML = '<div style="color:#888;">Нет истории изменений</div>';
+        } else {
+            body.innerHTML = '<ul style="padding-left:18px;">' + data.map(a => `<li><b>${a.ts.replace('T',' ').slice(0,19)}</b> — <b>${a.action}</b> (${a.entity} #${a.entity_id})<br>${a.details || ''}</li>`).join('') + '</ul>';
+        }
+    }
+    // --- Инициализация ---
+    addExportButtons();
 }); 

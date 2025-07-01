@@ -28,4 +28,21 @@ CREATE TABLE IF NOT EXISTS master_services (
 );
 
 -- Добавить user_id в requests (если ещё нет)
-ALTER TABLE requests ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE SET NULL; 
+ALTER TABLE requests ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_admins_userid_role ON admins(user_id, role);
+CREATE INDEX IF NOT EXISTS idx_admins_userid ON admins(user_id);
+CREATE INDEX IF NOT EXISTS idx_masters_userid ON masters(user_id);
+CREATE INDEX IF NOT EXISTS idx_master_services_masterid ON master_services(master_id);
+CREATE INDEX IF NOT EXISTS idx_master_services_serviceid ON master_services(service_id);
+CREATE INDEX IF NOT EXISTS idx_requests_userid ON requests(user_id);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+    id SERIAL PRIMARY KEY,
+    admin_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    action VARCHAR(32) NOT NULL,
+    entity VARCHAR(32) NOT NULL,
+    entity_id INTEGER,
+    details TEXT,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
+); 

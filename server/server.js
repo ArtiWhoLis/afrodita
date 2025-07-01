@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT_SECRET || 'afrodita_secret';
 const app = express();
 const PORT = process.env.PORT || 3001;
+const { Parser } = require('json2csv');
 
 // Настройте параметры подключения к вашей базе PostgreSQL
 const pool = new Pool({
@@ -363,6 +364,60 @@ app.get('/api/users/:id', roleAuth('admin'), async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Получить всех пользователей (id, fio, phone)
+app.get('/api/users', roleAuth('admin'), async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, fio, phone FROM users ORDER BY fio');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Экспорт заявок в CSV
+app.get('/api/export/requests', roleAuth('admin'), async (req, res) => {
+  const result = await pool.query('SELECT * FROM requests ORDER BY id DESC');
+  const parser = new Parser();
+  const csv = parser.parse(result.rows);
+  res.header('Content-Type', 'text/csv');
+  res.attachment('requests.csv');
+  res.send(csv);
+});
+
+// Экспорт пользователей в CSV
+app.get('/api/export/users', roleAuth('admin'), async (req, res) => {
+  const result = await pool.query('SELECT * FROM users ORDER BY id');
+  const parser = new Parser();
+  const csv = parser.parse(result.rows);
+  res.header('Content-Type', 'text/csv');
+  res.attachment('users.csv');
+  res.send(csv);
+});
+
+// Экспорт услуг в CSV
+app.get('/api/export/services', roleAuth('admin'), async (req, res) => {
+  const result = await pool.query('SELECT * FROM services ORDER BY id');
+  const parser = new Parser();
+  const csv = parser.parse(result.rows);
+  res.header('Content-Type', 'text/csv');
+  res.attachment('services.csv');
+  res.send(csv);
+});
+
+// Audit log: запись действий админов
+async function logAdminAction(adminId, action, entity, entityId, details) {
+  await pool.query('INSERT INTO audit_log (admin_id, action, entity, entity_id, details, ts) VALUES ($1, $2, $3, $4, $5, NOW())', [adminId, action, entity, entityId, details]);
+}
+
+// Сброс пароля пользователя через админку
+app.post('/api/users/:id/reset-password', roleAuth('admin'), async (req, res) => {
+  const { newPassword } = req.body;
+  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Пароль слишком короткий' });
+  const hash = await bcrypt.hash(newPassword, 10);
+  await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, req.params.id]);
+  res.json({ ok: true });
 });
 
 app.listen(PORT, () => {
