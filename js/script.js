@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Подгружаем услуги
     const serviceSelect = document.getElementById('service');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
     if (serviceSelect) {
         fetch('/api/services')
             .then(res => res.json())
@@ -46,10 +48,23 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             formMessage.textContent = '';
             const service = serviceSelect ? serviceSelect.value : '';
-            const date = document.getElementById('date') ? document.getElementById('date').value : '';
-            const time = document.getElementById('time') ? document.getElementById('time').value : '';
+            const date = dateInput ? dateInput.value : '';
+            const time = timeInput ? timeInput.value : '';
+            console.log('service:', service, 'date:', date, 'time:', time);
             const comment = document.getElementById('comment') ? document.getElementById('comment').value : '';
             if (!service || !date || !time) {
+                if (!service && serviceSelect) {
+                    serviceSelect.classList.add('error');
+                    serviceSelect.focus();
+                }
+                if (!date && dateInput) {
+                    dateInput.classList.add('error');
+                    if (service) dateInput.focus();
+                }
+                if (!time && timeInput) {
+                    timeInput.classList.add('error');
+                    if (service && date) timeInput.focus();
+                }
                 formMessage.textContent = 'Пожалуйста, заполните все поля.';
                 formMessage.style.color = 'red';
                 return;
@@ -59,6 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessage.style.color = 'red';
                 return;
             }
+            // Сбросить ошибку при успешной отправке
+            [serviceSelect, dateInput, timeInput].forEach(el => el && el.classList.remove('error'));
             const token = localStorage.getItem('token');
             fetch('/api/requests', {
                 method: 'POST',

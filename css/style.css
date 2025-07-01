@@ -784,4 +784,9 @@ input[type='search'], .filter-chip {
 .profile-panel__action:hover, .profile-panel__action:focus {
     background: #f7e3ea;
     color: #d17a97;
+}
+
+select.error, input.error {
+    border: 2px solid #d33 !important;
+    background: #fff0f0;
 } 
