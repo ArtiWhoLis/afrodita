@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ service, date, time, comment })
+                body: JSON.stringify({ service: Number(service), date, time, comment })
             })
             .then(res => res.json())
             .then(data => {
