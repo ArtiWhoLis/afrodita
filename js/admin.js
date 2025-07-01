@@ -40,63 +40,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // --- Скелетон на время проверки токена ---
-    const adminPanel = document.getElementById('admin-panel');
-    if (adminPanel && adminPanel.style.display !== '') {
-        adminPanel.innerHTML = '<div class="skeleton" style="height:180px;margin:40px 0 0 0;"></div>';
-    }
-    // --- Диагностика ошибок загрузки панели ---
-    function showPanelError(msg) {
+    // --- Простая инициализация панели ---
+    if (token) {
+        if (adminLogin) adminLogin.style.display = 'none';
         const adminPanel = document.getElementById('admin-panel');
-        if (adminPanel) {
-            adminPanel.innerHTML = `<div style='margin:60px auto 0 auto;max-width:480px;padding:32px 24px;background:linear-gradient(120deg,#fafafd,#f7f7fa);border-radius:12px;text-align:center;color:#a00;font-size:1.18em;box-shadow:0 2px 16px #0001;'>${msg}</div>`;
+        if (adminPanel) adminPanel.style.display = '';
+        // Кнопка выхода
+        let logoutBtn = document.getElementById('admin-logout-btn');
+        if (!logoutBtn) {
+            logoutBtn = document.createElement('button');
+            logoutBtn.id = 'admin-logout-btn';
+            logoutBtn.textContent = 'Выйти';
+            logoutBtn.className = 'btn-cancel';
+            logoutBtn.style = 'position:absolute;top:20px;right:30px;z-index:10;';
+            adminPanel.parentNode.insertBefore(logoutBtn, adminPanel);
+            logoutBtn.onclick = function() {
+                localStorage.removeItem('adminToken');
+                location.reload();
+            };
         }
+        // Вкладки
+        const tabs = document.querySelectorAll('.admin-tab');
+        const tabContents = document.querySelectorAll('.admin-tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                activateTab(tab.dataset.tab);
+            });
+        });
+        if (tabs[0]) tabs[0].classList.add('active');
+        if (tabContents[0]) tabContents[0].style.display = '';
+        // Сразу грузим данные для всех вкладок
+        loadRequests();
+        loadServices();
+        loadMasters();
+        loadAdmins();
+    } else {
+        if (adminLogin) adminLogin.style.display = '';
+        const adminPanel = document.getElementById('admin-panel');
+        if (adminPanel) adminPanel.style.display = 'none';
+        // Удаляем кнопку выхода, если есть
+        const logoutBtn = document.getElementById('admin-logout-btn');
+        if (logoutBtn) logoutBtn.remove();
     }
-    // --- Если уже авторизован ---
-    (async function() {
-        try {
-            if (await checkAdmin()) {
-                if (adminLogin) adminLogin.style.display = 'none';
-                const adminPanel = document.getElementById('admin-panel');
-                if (adminPanel) adminPanel.style.display = '';
-                // Кнопка выхода
-                let logoutBtn = document.getElementById('admin-logout-btn');
-                if (!logoutBtn) {
-                    logoutBtn = document.createElement('button');
-                    logoutBtn.id = 'admin-logout-btn';
-                    logoutBtn.textContent = 'Выйти';
-                    logoutBtn.className = 'btn-cancel';
-                    logoutBtn.style = 'position:absolute;top:20px;right:30px;z-index:10;';
-                    adminPanel.parentNode.insertBefore(logoutBtn, adminPanel);
-                    logoutBtn.onclick = function() {
-                        localStorage.removeItem('adminToken');
-                        location.reload();
-                    };
-                }
-                // Вкладки
-                const tabs = document.querySelectorAll('.admin-tab');
-                const tabContents = document.querySelectorAll('.admin-tab-content');
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        activateTab(tab.dataset.tab);
-                    });
-                });
-                // По умолчанию — заявки
-                if (tabs[0]) tabs[0].classList.add('active');
-                if (tabContents[0]) tabContents[0].style.display = '';
-            } else {
-                if (adminLogin) adminLogin.style.display = '';
-                const adminPanel = document.getElementById('admin-panel');
-                if (adminPanel) adminPanel.style.display = 'none';
-                // Удаляем кнопку выхода, если есть
-                const logoutBtn = document.getElementById('admin-logout-btn');
-                if (logoutBtn) logoutBtn.remove();
-            }
-        } catch (e) {
-            console.error('Ошибка инициализации админ-панели:', e);
-            showPanelError('Ошибка инициализации админ-панели: ' + (e.message || e));
-        }
-    })();
     // --- Дальнейшая логика: вкладки, загрузка данных, CRUD ---
     // --- Заявки ---
     async function loadRequests() {
