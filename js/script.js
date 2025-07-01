@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
+    // const token = localStorage.getItem('token');
+    // if (!token) {
+    //     window.location.href = 'login.html';
+    //     return;
+    // }
     const bookingForm = document.getElementById('booking-form');
     const formMessage = document.getElementById('form-message');
     const profileFio = document.getElementById('profile-fio');
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(user => {
                 if (!user) {
                     localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                    // window.location.href = 'login.html';
                     return;
                 }
                 profileFio.textContent = user.fio;
