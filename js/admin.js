@@ -65,10 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const tabContents = document.querySelectorAll('.admin-tab-content');
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.style.display = 'none');
-                    tab.classList.add('active');
-                    document.getElementById('tab-' + tab.dataset.tab).style.display = '';
+                    activateTab(tab.dataset.tab);
                 });
             });
             // По умолчанию — заявки
@@ -124,11 +121,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.querySelectorAll('button[data-id]').forEach(btn => {
             btn.onclick = async function() {
                 if (!confirm('Удалить заявку?')) return;
-                await fetch(`/api/requests/${btn.dataset.id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                await safeAction(async () => {
+                    await fetch(`/api/requests/${btn.dataset.id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }, () => {
+                    loadRequests();
                 });
-                loadRequests();
             };
         });
     }
@@ -148,8 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearBtn) {
         clearBtn.onclick = async function() {
             if (!confirm('Удалить все заявки?')) return;
-            await fetch('/api/requests', { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-            loadRequests();
+            await safeAction(async () => {
+                await fetch('/api/requests', { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            }, () => {
+                loadRequests();
+            });
         };
     }
     // --- События фильтрации ---
@@ -209,11 +212,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.querySelectorAll('button[data-del]').forEach(btn => {
             btn.onclick = async () => {
                 if (!confirm('Удалить услугу?')) return;
-                await fetch(`/api/services/${btn.dataset.del}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                await safeAction(async () => {
+                    await fetch(`/api/services/${btn.dataset.del}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }, () => {
+                    loadServices();
                 });
-                loadServices();
             };
         });
     }
@@ -250,21 +256,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.name.value.trim();
             const description = this.description.value.trim();
             if (!name) return alert('Название обязательно');
-            if (mode === 'edit') {
-                await fetch(`/api/services/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ name, description })
-                });
-            } else {
-                await fetch('/api/services', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ name, description })
-                });
-            }
-            modal.style.display = 'none';
-            loadServices();
+            await safeAction(async () => {
+                if (mode === 'edit') {
+                    await fetch(`/api/services/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ name, description })
+                    });
+                } else {
+                    await fetch('/api/services', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ name, description })
+                    });
+                }
+            }, () => {
+                modal.style.display = 'none';
+                loadServices();
+            });
         };
     }
     // --- Кнопка добавить услугу ---
@@ -318,11 +327,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.querySelectorAll('button[data-del]').forEach(btn => {
             btn.onclick = async () => {
                 if (!confirm('Удалить мастера?')) return;
-                await fetch(`/api/masters/${btn.dataset.del}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                await safeAction(async () => {
+                    await fetch(`/api/masters/${btn.dataset.del}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }, () => {
+                    loadMasters();
                 });
-                loadMasters();
             };
         });
     }
@@ -374,30 +386,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const position = this.position.value.trim();
             const servicesSelected = Array.from(this.services.selectedOptions).map(o => +o.value);
             if (!fio || !position || !servicesSelected.length) return alert('Заполните все поля и выберите хотя бы одну услугу');
-            if (mode === 'edit') {
-                await fetch(`/api/masters/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ fio, position })
-                });
-                // Сбросить все старые связи и добавить новые
-                await fetch(`/api/master-services?master_id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-                for (const sid of servicesSelected) {
-                    await fetch('/api/master-services', {
-                        method: 'POST',
+            await safeAction(async () => {
+                if (mode === 'edit') {
+                    await fetch(`/api/masters/${id}`, {
+                        method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify({ master_id: id, service_id: sid })
+                        body: JSON.stringify({ fio, position })
                     });
+                    // Сбросить все старые связи и добавить новые
+                    await fetch(`/api/master-services?master_id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    for (const sid of servicesSelected) {
+                        await fetch('/api/master-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ master_id: id, service_id: sid })
+                        });
+                    }
+                } else {
+                    // Для добавления нужен user_id (создаётся через регистрацию, затем назначается ролью мастер)
+                    // Здесь можно реализовать выбор пользователя или автосоздание
+                    alert('Добавление мастера реализуется через регистрацию пользователя и назначение роли мастер в разделе "Админы".');
+                    modal.style.display = 'none';
+                    return;
                 }
-            } else {
-                // Для добавления нужен user_id (создаётся через регистрацию, затем назначается ролью мастер)
-                // Здесь можно реализовать выбор пользователя или автосоздание
-                alert('Добавление мастера реализуется через регистрацию пользователя и назначение роли мастер в разделе "Админы".');
+            }, () => {
                 modal.style.display = 'none';
-                return;
-            }
-            modal.style.display = 'none';
-            loadMasters();
+                loadMasters();
+            });
         };
     }
     // --- Кнопка добавить мастера ---
@@ -445,11 +460,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.querySelectorAll('button[data-del]').forEach(btn => {
             btn.onclick = async () => {
                 if (!confirm('Удалить админа/мастера?')) return;
-                await fetch(`/api/admins/${btn.dataset.del}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                await safeAction(async () => {
+                    await fetch(`/api/admins/${btn.dataset.del}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }, () => {
+                    loadAdmins();
                 });
-                loadAdmins();
             };
         });
     }
@@ -495,38 +513,78 @@ document.addEventListener('DOMContentLoaded', function() {
             const user_id = this.user_id.value;
             const role = this.role.value;
             if (!user_id || !role) return alert('Выберите пользователя и роль');
-            if (mode === 'edit') {
-                await fetch(`/api/admins/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ user_id, role })
-                });
-            } else {
-                await fetch('/api/admins', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ user_id, role })
-                });
-            }
-            modal.style.display = 'none';
-            loadAdmins();
+            await safeAction(async () => {
+                if (mode === 'edit') {
+                    await fetch(`/api/admins/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ user_id, role })
+                    });
+                } else {
+                    await fetch('/api/admins', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ user_id, role })
+                    });
+                }
+            }, () => {
+                modal.style.display = 'none';
+                loadAdmins();
+            });
         };
     }
     // --- Кнопка добавить админа ---
     const addAdminBtn = document.getElementById('add-admin-btn');
     if (addAdminBtn) addAdminBtn.onclick = () => showAdminForm('add');
-    // --- Инициализация ---
-    if (document.getElementById('tab-requests')) {
-        loadServicesForFilter();
-        loadRequests();
+    // --- Уведомления ---
+    function showNotice(msg, isError = false) {
+        let notice = document.getElementById('admin-notice');
+        if (!notice) {
+            notice = document.createElement('div');
+            notice.id = 'admin-notice';
+            notice.style = 'position:fixed;top:30px;right:30px;z-index:9999;padding:14px 22px;border-radius:8px;font-size:1.1em;box-shadow:0 2px 12px #0002;transition:opacity .3s;';
+            document.body.appendChild(notice);
+        }
+        notice.textContent = msg;
+        notice.style.background = isError ? '#ffd6d6' : '#d6ffd6';
+        notice.style.color = isError ? '#a00' : '#070';
+        notice.style.opacity = '1';
+        setTimeout(() => { notice.style.opacity = '0'; }, 2200);
     }
-    if (document.getElementById('tab-services')) {
-        loadServices();
+    // --- Перегрузка вкладок ---
+    function activateTab(tabName) {
+        const tabs = document.querySelectorAll('.admin-tab');
+        const tabContents = document.querySelectorAll('.admin-tab-content');
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.style.display = 'none');
+        const tab = document.querySelector(`.admin-tab[data-tab="${tabName}"]`);
+        const content = document.getElementById('tab-' + tabName);
+        if (tab && content) {
+            tab.classList.add('active');
+            content.style.display = '';
+            if (tabName === 'requests') loadRequests();
+            if (tabName === 'services') loadServices();
+            if (tabName === 'masters') loadMasters();
+            if (tabName === 'admins') loadAdmins();
+        }
     }
-    if (document.getElementById('tab-masters')) {
-        loadMasters();
+    // --- После любого действия обновлять список и показывать уведомление ---
+    // (пример для услуг, аналогично для других сущностей)
+    async function safeAction(action, onSuccess) {
+        try {
+            await action();
+            showNotice('Успешно!');
+            if (onSuccess) onSuccess();
+        } catch (e) {
+            showNotice(e.message || 'Ошибка запроса', true);
+        }
     }
-    if (document.getElementById('tab-admins')) {
-        loadAdmins();
-    }
+    // --- Пример использования safeAction ---
+    // Везде, где был fetch(...), обернуть в safeAction(() => fetch(...), ...)
+    // Например, в showServiceForm:
+    // await safeAction(async () => { await fetch(...) }, () => { modal.style.display = 'none'; loadServices(); });
+    // --- Аналогично для мастеров, админов, заявок ---
+    // ... (все CRUD-операции обернуть в safeAction)
+    // --- При открытии страницы по умолчанию активировать первую вкладку и загрузить данные ---
+    activateTab('requests');
 }); 
