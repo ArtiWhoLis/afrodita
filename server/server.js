@@ -394,11 +394,24 @@ app.get('/api/my-requests', roleAuth('user'), async (req, res) => {
       return res.json([]);
     }
     const masterId = masterRes.rows[0].id;
-    const servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
-    const serviceIds = servRes.rows.map(r => String(r.service_id));
+    let servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
+    let serviceIds = servRes.rows.map(r => String(r.service_id));
+    // Если нет услуг — пробуем автоматически добавить услугу, если есть заявки с этим мастером
     if (serviceIds.length === 0) {
-      console.log('[MASTER REQUESTS] Нет услуг для masterId', masterId);
-      return res.json([]);
+      const reqRes = await pool.query('SELECT DISTINCT service FROM requests WHERE user_id = $1', [req.userId]);
+      const foundServices = reqRes.rows.map(r => String(r.service));
+      if (foundServices.length > 0) {
+        for (const sid of foundServices) {
+          await pool.query('INSERT INTO master_services (master_id, service_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [masterId, sid]);
+        }
+        console.log('[MASTER REQUESTS] Автоматически добавлены услуги для masterId', masterId, foundServices);
+        // Повторно получаем услуги
+        servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
+        serviceIds = servRes.rows.map(r => String(r.service_id));
+      } else {
+        console.log('[MASTER REQUESTS] Нет услуг для masterId', masterId);
+        return res.json([]);
+      }
     }
     // Лог для отладки
     console.log('[MASTER REQUESTS]', { userId: req.userId, masterId, serviceIds });
@@ -528,6 +541,15 @@ app.get('/api/my-master', roleAuth('user'), async (req, res) => {
   const result = await pool.query('SELECT id, position FROM masters WHERE user_id = $1', [req.userId]);
   if (result.rows.length === 0) return res.json({});
   res.json(result.rows[0]);
+});
+
+// Получить услуги текущего мастера (для мастера)
+app.get('/api/my-services', roleAuth('user'), async (req, res) => {
+  const masterRes = await pool.query('SELECT id FROM masters WHERE user_id = $1', [req.userId]);
+  if (masterRes.rows.length === 0) return res.json([]);
+  const masterId = masterRes.rows[0].id;
+  const servRes = await pool.query('SELECT service_id FROM master_services WHERE master_id = $1', [masterId]);
+  res.json(servRes.rows.map(r => r.service_id));
 });
 
 app.listen(PORT, () => {

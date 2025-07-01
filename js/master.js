@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         // Получить услуги мастера
         if (masterId) {
-            const msRes = await fetch('/api/master-services?master_id=' + masterId, { headers: { 'Authorization': 'Bearer ' + token } });
+            const msRes = await fetch('/api/my-services', { headers: { 'Authorization': 'Bearer ' + token } });
             if (msRes.ok) {
                 const ms = await msRes.json();
-                serviceIds = ms.map(x => x.service_id);
+                serviceIds = ms.map(x => String(x));
             }
         }
         // Получить все услуги (для отображения названия)
