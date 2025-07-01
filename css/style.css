@@ -614,4 +614,100 @@ input[type='search'], .filter-chip {
 @media (max-width: 600px) {
   .login-tabs { flex-direction: column; border-radius: 18px; }
   .login-tab { font-size: 1.18em; padding: 16px 0; }
+}
+
+/* Profile menu (header) */
+.profile-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.profile-btn {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 6px 14px 6px 6px;
+    border-radius: 24px;
+    font-weight: bold;
+    font-size: 1.08em;
+    transition: background 0.2s;
+    box-shadow: 0 1px 6px rgba(209,122,151,0.07);
+    gap: 8px;
+}
+.profile-btn:hover, .profile-btn:focus {
+    background: #f7e3ea;
+}
+.profile-avatar {
+    width: 32px;
+    height: 32px;
+    background: #d17a97;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-right: 6px;
+    box-shadow: 0 1px 4px rgba(209,122,151,0.13);
+}
+.profile-name {
+    margin-right: 4px;
+    color: #333;
+    font-weight: 600;
+}
+.profile-arrow {
+    margin-left: 2px;
+    transition: transform 0.2s;
+}
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 110%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(209,122,151,0.13);
+    min-width: 140px;
+    z-index: 100;
+    padding: 8px 0;
+    animation: fadeInBg 0.2s;
+}
+.profile-dropdown.open {
+    display: block;
+}
+.profile-dropdown a {
+    display: block;
+    padding: 10px 22px;
+    color: #444;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.profile-dropdown a:hover {
+    background: #f7e3ea;
+    color: #d17a97;
+}
+
+/* Header actions (right) */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.btn-secondary {
+    background: #444 !important;
+    color: #fff !important;
+    margin-left: 0;
+}
+.btn-secondary:hover, .btn-secondary:focus {
+    background: #222 !important;
+    color: #fff !important;
+}
+@media (max-width: 600px) {
+    .header-actions { flex-direction: column; gap: 6px; }
+    .profile-btn { width: 100%; justify-content: flex-start; }
+    .profile-dropdown { min-width: 120px; }
 } 
