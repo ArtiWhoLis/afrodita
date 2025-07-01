@@ -152,7 +152,7 @@ app.post('/api/admin/login', async (req, res) => {
     if (!match) {
       return res.status(401).json({ error: 'Неверный пароль' });
     }
-    const token = jwt.sign({ id: user.id, admin: true }, SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, role: 'admin' }, SECRET, { expiresIn: '7d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ error: err.message });
