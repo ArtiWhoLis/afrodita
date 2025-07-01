@@ -24,6 +24,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../'))); // для отдачи статики
 
+// Middleware для отключения кэширования API
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    res.set('Cache-Control', 'no-store');
+  }
+  next();
+});
+
 // Получить все заявки
 app.get('/api/requests', async (req, res) => {
   try {
