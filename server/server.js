@@ -49,7 +49,7 @@ app.get('/api/requests', async (req, res) => {
 
 // Добавить заявку
 app.post('/api/requests', async (req, res) => {
-  const { name, phone, service, date, time, comment } = req.body;
+  const { name, phone, service, date, time, comment, user_id } = req.body;
   if (!name || !phone || !service || !date || !time) {
     return res.status(400).json({ error: 'Заполните все обязательные поля' });
   }
@@ -63,8 +63,8 @@ app.post('/api/requests', async (req, res) => {
       return res.status(409).json({ error: 'Это время уже занято. Пожалуйста, выберите другое.' });
     }
     const result = await pool.query(
-      'INSERT INTO requests (name, phone, service, date, time, comment) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-      [name, phone, service, date, time, comment]
+      'INSERT INTO requests (name, phone, service, date, time, comment, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [name, phone, service, date, time, comment, user_id]
     );
     res.json({ id: result.rows[0].id });
   } catch (err) {
