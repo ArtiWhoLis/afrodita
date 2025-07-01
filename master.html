@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель мастера - Афродита</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .master-panel-header { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 18px; }
+        .master-panel-header input, .master-panel-header select { padding: 6px 10px; border-radius: 4px; border: 1px solid #ddd; }
+        .master-panel-header .btn { padding: 6px 14px; border-radius: 4px; border: 1px solid #d17a97; background: #fff; color: #d17a97; cursor: pointer; }
+        .master-panel-header .btn:active { background: #f7e6ee; }
+        .service-badge { display: inline-block; background: #f7b6d2; color: #222; border-radius: 6px; padding: 2px 8px; font-size: 0.95em; margin-right: 4px; }
+    </style>
 </head>
 <body>
     <header>
-        <div class="container">
+        <div class="container nav-flex">
             <a href="index.html" class="logo">Афродита</a>
-            <nav>
+            <nav class="main-nav" aria-label="Главное меню">
                 <ul>
                     <li><a href="index.html">Главная</a></li>
                     <li><a href="services.html">Услуги</a></li>
@@ -25,15 +32,15 @@
         <section class="page-title fade-in">
             <div class="container">
                 <h1>Панель мастера</h1>
+                <div id="master-info" style="margin-bottom:18px;"></div>
             </div>
         </section>
         <section>
-            <div class="container" style="max-width:900px;margin:auto;">
-                <div id="master-info" style="margin-bottom:24px;"></div>
-                <div style="margin-bottom:18px;display:flex;gap:16px;align-items:center;">
-                    <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                    <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                    <button id="copy-log-btn" style="padding:6px 14px;border-radius:4px;border:1px solid #d17a97;background:#fff;color:#d17a97;cursor:pointer;">Копировать лог</button>
+            <div class="container" style="max-width:1000px;margin:auto;">
+                <div class="master-panel-header">
+                    <input type="date" id="filter-date">
+                    <input type="text" id="filter-search" placeholder="Поиск по имени, телефону или услуге">
+                    <button id="copy-log-btn" class="btn">Копировать лог</button>
                 </div>
                 <table class="admin-table">
                     <thead>
