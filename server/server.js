@@ -349,6 +349,16 @@ app.post('/api/admins', roleAuth('admin'), async (req, res) => {
   const { user_id, role } = req.body;
   if (!user_id || !role) return res.status(400).json({ error: 'user_id и role обязательны' });
   const result = await pool.query('INSERT INTO admins (user_id, role) VALUES ($1, $2) RETURNING *', [user_id, role]);
+  // Если назначаем роль "master", создаём мастера, если его ещё нет
+  if (role === 'master') {
+    const masterExists = await pool.query('SELECT id FROM masters WHERE user_id = $1', [user_id]);
+    if (masterExists.rows.length === 0) {
+      // Получаем ФИО пользователя
+      const userRes = await pool.query('SELECT fio FROM users WHERE id = $1', [user_id]);
+      const fio = userRes.rows.length ? userRes.rows[0].fio : '';
+      await pool.query('INSERT INTO masters (fio, position, user_id) VALUES ($1, $2, $3)', [fio, '', user_id]);
+    }
+  }
   res.json(result.rows[0]);
 });
 
