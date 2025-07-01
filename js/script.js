@@ -10,40 +10,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const profilePhone = document.getElementById('profile-phone');
     const editProfileBtn = document.getElementById('edit-profile-btn');
     // Получаем профиль
-    fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
-        .then(res => res.ok ? res.json() : null)
-        .then(user => {
-            if (!user) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-                return;
-            }
-            profileFio.textContent = user.fio;
-            profilePhone.textContent = user.phone;
-        });
+    if (profileFio && profilePhone) {
+        fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.ok ? res.json() : null)
+            .then(user => {
+                if (!user) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                profileFio.textContent = user.fio;
+                profilePhone.textContent = user.phone;
+            });
+    }
     if (editProfileBtn) {
         editProfileBtn.onclick = () => window.location.href = 'profile.html';
     }
     // Подгружаем услуги
     const serviceSelect = document.getElementById('service');
-    fetch('/api/services')
-        .then(res => res.json())
-        .then(services => {
-            serviceSelect.innerHTML = '<option value="">--Пожалуйста, выберите--</option>';
-            services.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.textContent = s.name;
-                serviceSelect.appendChild(opt);
+    if (serviceSelect) {
+        fetch('/api/services')
+            .then(res => res.json())
+            .then(services => {
+                serviceSelect.innerHTML = '<option value="">--Пожалуйста, выберите--</option>';
+                services.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.name;
+                    serviceSelect.appendChild(opt);
+                });
             });
-        });
-    if (bookingForm) {
+    }
+    if (bookingForm && formMessage) {
         bookingForm.addEventListener('submit', function(e) {
             e.preventDefault();
             formMessage.textContent = '';
-            const service = serviceSelect.value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
+            const service = serviceSelect ? serviceSelect.value : '';
+            const date = document.getElementById('date') ? document.getElementById('date').value : '';
+            const time = document.getElementById('time') ? document.getElementById('time').value : '';
             const comment = document.getElementById('comment') ? document.getElementById('comment').value : '';
             if (!service || !date || !time) {
                 formMessage.textContent = 'Пожалуйста, заполните все поля.';
@@ -55,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessage.style.color = 'red';
                 return;
             }
+            const token = localStorage.getItem('token');
             fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
