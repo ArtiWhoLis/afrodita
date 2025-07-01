@@ -44,13 +44,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     if (bookingForm && formMessage) {
-        bookingForm.addEventListener('submit', function(e) {
+        let userProfile = null;
+        // Предзагрузка профиля для бронирования
+        if (token) {
+            fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(res => res.ok ? res.json() : null)
+                .then(user => {
+                    if (user) userProfile = user;
+                });
+        }
+        bookingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             formMessage.textContent = '';
             const service = serviceSelect ? serviceSelect.value : '';
             const date = dateInput ? dateInput.value : '';
             const time = timeInput ? timeInput.value : '';
-            console.log('service:', service, 'date:', date, 'time:', time);
             const comment = document.getElementById('comment') ? document.getElementById('comment').value : '';
             if (!service || !date || !time) {
                 if (!service && serviceSelect) {
@@ -74,13 +82,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessage.style.color = 'red';
                 return;
             }
-            // Сбросить ошибку при успешной отправке
             [serviceSelect, dateInput, timeInput].forEach(el => el && el.classList.remove('error'));
-            const token = localStorage.getItem('token');
+            // Получаем профиль, если не был загружен
+            let fio = null, phone = null;
+            if (userProfile) {
+                fio = userProfile.fio;
+                phone = userProfile.phone;
+            } else if (token) {
+                try {
+                    const res = await fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (res.ok) {
+                        const user = await res.json();
+                        fio = user.fio;
+                        phone = user.phone;
+                    }
+                } catch {}
+            }
+            if (!fio || !phone) {
+                formMessage.textContent = 'Ошибка: не удалось получить профиль пользователя.';
+                formMessage.style.color = 'red';
+                return;
+            }
             fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ service: Number(service), date, time, comment })
+                body: JSON.stringify({ service: Number(service), date, time, name: fio, phone, comment })
             })
             .then(res => res.json())
             .then(data => {
