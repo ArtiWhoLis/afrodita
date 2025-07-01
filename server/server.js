@@ -198,6 +198,36 @@ app.get('/api/profile', auth, async (req, res) => {
   }
 });
 
+// Обновление профиля пользователя
+app.put('/api/profile', auth, async (req, res) => {
+  const { fio, phone } = req.body;
+  if (!fio || fio.length < 3) {
+    return res.status(400).json({ error: 'Введите корректное ФИО (минимум 3 символа)' });
+  }
+  if (!/^\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}$/.test(phone)) {
+    return res.status(400).json({ error: 'Введите телефон в формате +7 (XXX) XXX-XX-XX' });
+  }
+  try {
+    // Приводим телефон к числовому виду для хранения (например, 79991234567)
+    const phoneDigits = '7' + phone.replace(/\D/g, '').slice(1);
+    // Проверка на уникальность телефона (кроме текущего пользователя)
+    const exists = await pool.query('SELECT id FROM users WHERE phone = $1 AND id <> $2', [phoneDigits, req.userId]);
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ error: 'Пользователь с таким телефоном уже существует' });
+    }
+    // Обновление
+    const result = await pool.query('UPDATE users SET fio = $1, phone = $2 WHERE id = $3 RETURNING id, fio, phone', [fio, phoneDigits, req.userId]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    // Логирование действия
+    if (typeof logAdminAction === 'function') {
+      await logAdminAction(req.userId, 'update_profile', 'users', req.userId, { fio, phone });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- Роли и авторизация ---
 function getRole(req) {
   // userId всегда есть, если auth прошёл
