@@ -8,6 +8,9 @@ const SECRET = process.env.JWT_SECRET || 'afrodita_secret';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const { Parser } = require('json2csv');
+const multer = require('multer');
+const fs = require('fs');
+const upload = multer({ dest: 'uploads/' });
 
 // Настройте параметры подключения к вашей базе PostgreSQL
 const pool = new Pool({
@@ -31,6 +34,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use('/uploads', express.static('uploads'));
 
 // Получить все заявки
 app.get('/api/requests', async (req, res) => {
@@ -262,15 +267,43 @@ app.get('/api/services', async (req, res) => {
   const result = await pool.query('SELECT * FROM services ORDER BY id');
   res.json(result.rows);
 });
-app.post('/api/services', roleAuth('admin'), async (req, res) => {
+app.post('/api/services', roleAuth('admin'), upload.single('img'), async (req, res) => {
   const { name, description } = req.body;
+  let img = null;
+  if (req.file) {
+    img = '/uploads/' + req.file.filename + path.extname(req.file.originalname);
+    const oldPath = req.file.path;
+    const newPath = req.file.destination + '/' + req.file.filename + path.extname(req.file.originalname);
+    fs.renameSync(oldPath, newPath);
+  }
   if (!name) return res.status(400).json({ error: 'Название обязательно' });
-  const result = await pool.query('INSERT INTO services (name, description) VALUES ($1, $2) RETURNING *', [name, description]);
+  const result = await pool.query(
+    'INSERT INTO services (name, description, img) VALUES ($1, $2, $3) RETURNING *',
+    [name, description, img]
+  );
   res.json(result.rows[0]);
 });
-app.put('/api/services/:id', roleAuth('admin'), async (req, res) => {
+app.put('/api/services/:id', roleAuth('admin'), upload.single('img'), async (req, res) => {
   const { name, description } = req.body;
-  const result = await pool.query('UPDATE services SET name=$1, description=$2 WHERE id=$3 RETURNING *', [name, description, req.params.id]);
+  let img = null;
+  if (req.file) {
+    img = '/uploads/' + req.file.filename + path.extname(req.file.originalname);
+    const oldPath = req.file.path;
+    const newPath = req.file.destination + '/' + req.file.filename + path.extname(req.file.originalname);
+    fs.renameSync(oldPath, newPath);
+  }
+  let query = 'UPDATE services SET name=$1, description=$2';
+  let params = [name, description];
+  if (img) {
+    query += ', img=$3';
+    params.push(img);
+    query += ' WHERE id=$4 RETURNING *';
+    params.push(req.params.id);
+  } else {
+    query += ' WHERE id=$3 RETURNING *';
+    params.push(req.params.id);
+  }
+  const result = await pool.query(query, params);
   res.json(result.rows[0]);
 });
 app.delete('/api/services/:id', roleAuth('admin'), async (req, res) => {
