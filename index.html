@@ -9,18 +9,34 @@
 </head>
 <body>
     <header>
-        <div class="container">
+        <div class="container nav-flex">
             <a href="index.html" class="logo">Афродита</a>
-            <nav>
-                <ul id="main-nav">
+            <nav class="main-nav" aria-label="Главное меню">
+                <ul>
                     <li><a href="index.html" class="active">Главная</a></li>
                     <li><a href="services.html">Услуги</a></li>
                     <li><a href="booking.html">Запись</a></li>
                     <li><a href="contacts.html">Контакты</a></li>
                 </ul>
             </nav>
-            <div class="header-actions" id="header-actions">
-                <!-- Динамически: профиль или кнопки входа/регистрации -->
+            <div class="profile-actions">
+                <!-- Пример для авторизованного пользователя -->
+                <div class="profile-menu">
+                    <button class="profile-btn" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+                        <span class="profile-avatar">С</span>
+                        <span class="profile-name">Санечка</span>
+                        <svg class="profile-arrow" width="16" height="16" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" stroke="#888" stroke-width="2" fill="none"/></svg>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown" tabindex="-1">
+                        <a href="profile.html">Профиль</a>
+                        <a href="#" id="logoutLink">Выйти</a>
+                    </div>
+                </div>
+                <!-- Для неавторизованного пользователя (раскомментировать при необходимости) -->
+                <!--
+                <a href="booking.html" class="btn">Записаться онлайн</a>
+                <a href="login.html" class="btn btn-secondary">Вход</a>
+                -->
             </div>
         </div>
     </header>
