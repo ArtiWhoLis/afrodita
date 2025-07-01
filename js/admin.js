@@ -246,6 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <label>Описание</label>
                         <textarea name="description" maxlength="300" placeholder="Описание услуги (необязательно)">${service.description || ''}</textarea>
                     </div>
+                    <div class="form-group">
+                        <label>Фото</label>
+                        <input type="file" name="img" accept="image/*">
+                    </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn">${mode === 'edit' ? 'Сохранить' : 'Добавить'}</button>
                     </div>
@@ -257,20 +261,41 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const name = this.name.value.trim();
             const description = this.description.value.trim();
+            const imgFile = this.img.files[0];
             if (!name) return alert('Название обязательно');
             await safeAction(async () => {
-                if (mode === 'edit') {
-                    await fetch(`/api/services/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify({ name, description })
-                    });
+                if (imgFile) {
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('description', description);
+                    formData.append('img', imgFile);
+                    if (mode === 'edit') {
+                        await fetch(`/api/services/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': 'Bearer ' + token },
+                            body: formData
+                        });
+                    } else {
+                        await fetch('/api/services', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + token },
+                            body: formData
+                        });
+                    }
                 } else {
-                    await fetch('/api/services', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify({ name, description })
-                    });
+                    if (mode === 'edit') {
+                        await fetch(`/api/services/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ name, description })
+                        });
+                    } else {
+                        await fetch('/api/services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ name, description })
+                        });
+                    }
                 }
             }, () => {
                 modal.style.display = 'none';
@@ -484,6 +509,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Получить всех пользователей (для выбора)
         const usersRes = await fetch('/api/users', { headers: { 'Authorization': 'Bearer ' + token } });
         const users = await usersRes.json();
+        function renderUserOptions(role) {
+            let filtered = users;
+            if (role === 'admin') {
+                filtered = users.filter(u => u.role !== 'master');
+            } else if (role === 'master') {
+                filtered = users.filter(u => u.role !== 'admin');
+            }
+            return filtered.map(u => `<option value="${u.id}"${u.id == admin.user_id ? ' selected' : ''}>${u.fio} (${u.phone})</option>`).join('');
+        }
         modal.innerHTML = `
             <div style="background:#fff;padding:24px 28px;border-radius:10px;box-shadow:0 2px 12px #0003;max-width:420px;margin:40px auto;position:relative;">
                 <button id="close-admin-modal" style="position:absolute;top:8px;right:12px;font-size:1.3em;background:none;border:none;">×</button>
@@ -494,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <input type="text" id="user-search" placeholder="Поиск по ФИО/телефону" style="width:100%;margin-bottom:6px;">
                         <select name="user_id" required style="width:100%;">
                             <option value="">Выберите пользователя</option>
-                            ${users.map(u => `<option value="${u.id}"${u.id == admin.user_id ? ' selected' : ''}>${u.fio} (${u.phone})</option>`).join('')}
+                            ${renderUserOptions(admin.role)}
                         </select>
                     </div>
                     <div class="form-group">
@@ -517,6 +551,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const userSearch = document.getElementById('user-search');
         const userSelect = modal.querySelector('select[name="user_id"]');
         userSearch.oninput = () => filterUserOptions(userSearch, userSelect);
+        // Фильтрация по роли
+        const roleSelect = modal.querySelector('select[name="role"]');
+        roleSelect.onchange = function() {
+            userSelect.innerHTML = '<option value="">Выберите пользователя</option>' + renderUserOptions(this.value);
+        };
         // Сброс пароля
         if (mode === 'edit') {
             document.getElementById('reset-password-btn').onclick = async () => {

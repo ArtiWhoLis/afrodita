@@ -216,6 +216,24 @@
                 fioSpan.textContent = user.fio;
                 fioLg.textContent = user.fio;
                 phone.textContent = user.phone.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ••• ••• •• $5');
+                // Добавить кнопку Панель мастера, если есть роль master
+                if (user.role === 'master') {
+                    const masterBtn = document.createElement('a');
+                    masterBtn.href = 'master.html';
+                    masterBtn.className = 'profile-panel__action';
+                    masterBtn.textContent = 'Панель мастера';
+                    const dropdown = document.getElementById('profilePanelDropdown');
+                    dropdown.insertBefore(masterBtn, dropdown.querySelector('.profile-panel__action[href="profile.html"]'));
+                }
+                // Добавить кнопку Админ-панель, если есть роль admin
+                if (user.role === 'admin') {
+                    const adminBtn = document.createElement('a');
+                    adminBtn.href = 'admin.html';
+                    adminBtn.className = 'profile-panel__action';
+                    adminBtn.textContent = 'Админ-панель';
+                    const dropdown = document.getElementById('profilePanelDropdown');
+                    dropdown.insertBefore(adminBtn, dropdown.querySelector('.profile-panel__action[href="profile.html"]'));
+                }
             });
     });
     </script>
