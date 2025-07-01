@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabUser = document.getElementById('tab-user');
     const tabAdmin = document.getElementById('tab-admin');
     const phoneLabel = document.querySelector('label[for="phone"]');
+    const loginIcon = document.getElementById('login-icon');
     let isAdmin = false;
 
     // Маска телефона для пользователя
@@ -44,6 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Анимация
             tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
             tabUser.style.transition = 'background 0.2s, border-bottom 0.2s';
+            if (loginIcon) {
+                loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png';
+                loginIcon.style.transform = 'scale(1.08) rotate(-6deg)';
+                setTimeout(()=>loginIcon.style.transform='', 200);
+            }
         } else {
             tabUser.classList.add('active');
             tabAdmin.classList.remove('active');
@@ -54,6 +60,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Анимация
             tabUser.style.transition = 'background 0.2s, border-bottom 0.2s';
             tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
+            if (loginIcon) {
+                loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+                loginIcon.style.transform = 'scale(1.08) rotate(6deg)';
+                setTimeout(()=>loginIcon.style.transform='', 200);
+            }
         }
     }
     if (tabUser && tabAdmin) {
@@ -99,4 +110,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Фокус-эффекты для полей
+    document.querySelectorAll('#login-form input').forEach(inp => {
+        inp.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 2px #f7b0c3';
+        });
+        inp.addEventListener('blur', function() {
+            this.style.boxShadow = '';
+        });
+    });
 }); 
