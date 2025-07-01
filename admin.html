@@ -54,24 +54,24 @@
                     </div>
                     <div id="tab-requests" class="admin-tab-content">
                         <!-- Секция заявок (будет заполнена js) -->
-                        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
-                            <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+                        <input type="date" id="filter-date" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
                             <select id="filter-service" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;"></select>
-                            <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-                            <button id="clear-requests" class="btn-cancel" style="margin-left:auto;">Очистить все заявки</button>
-                        </div>
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Имя</th>
-                                    <th>Телефон</th>
-                                    <th>Услуга</th>
-                                    <th>Дата</th>
-                                    <th>Время</th>
-                                    <th>Комментарий</th>
-                                    <th>Действие</th>
-                                </tr>
-                            </thead>
+                        <input type="text" id="filter-search" placeholder="Поиск по имени или телефону" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
+                        <button id="clear-requests" class="btn-cancel" style="margin-left:auto;">Очистить все заявки</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Телефон</th>
+                                <th>Услуга</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Комментарий</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
                             <tbody id="requests-body"></tbody>
                         </table>
                     </div>
@@ -114,7 +114,7 @@
                                 <tr><th>ФИО</th><th>Телефон</th><th>Роль</th><th>Действие</th></tr>
                             </thead>
                             <tbody id="admins-body"></tbody>
-                        </table>
+                    </table>
                         <div id="admin-form-modal" style="display:none;"></div>
                     </div>
                 </div>

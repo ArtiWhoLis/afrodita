@@ -663,7 +663,6 @@ input[type='search'], .filter-chip {
     transition: transform 0.2s;
 }
 .profile-dropdown {
-    display: none;
     position: absolute;
     right: 0;
     top: 110%;
@@ -674,13 +673,15 @@ input[type='search'], .filter-chip {
     z-index: 9999;
     padding: 8px 0;
     animation: fadeInBg 0.2s;
-    pointer-events: auto;
+    pointer-events: none;
     opacity: 0;
     transition: opacity 0.18s;
+    display: none;
 }
 .profile-dropdown.open {
     display: block;
     opacity: 1;
+    pointer-events: auto;
 }
 .profile-btn:active {
     background: #f7e3ea;
