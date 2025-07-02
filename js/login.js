@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const message = document.getElementById('login-message');
     const phoneInput = document.getElementById('phone');
     const tabUser = document.getElementById('tab-user');
+    const tabMaster = document.getElementById('tab-master');
     const tabAdmin = document.getElementById('tab-admin');
     const phoneLabel = document.querySelector('label[for="phone"]');
     const loginIcon = document.getElementById('login-icon');
     let isAdmin = false;
+    let isMaster = false;
 
     // Маска телефона для пользователя
     function enablePhoneMask() {
@@ -33,11 +35,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function phoneMaskFocus() {
         if (!this.value.startsWith('+7')) this.value = '+7 (';
     }
-    function setTab(admin) {
+    function setTab(admin, master) {
         isAdmin = admin;
+        isMaster = master;
         if (admin) {
             tabAdmin.classList.add('active');
             tabUser.classList.remove('active');
+            tabMaster.classList.remove('active');
             phoneInput.removeAttribute('pattern');
             phoneInput.setAttribute('placeholder', 'Логин администратора');
             if (phoneLabel) phoneLabel.textContent = 'Логин';
@@ -45,13 +49,32 @@ document.addEventListener('DOMContentLoaded', function() {
             // Анимация
             tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
             tabUser.style.transition = 'background 0.2s, border-bottom 0.2s';
+            tabMaster.style.transition = 'background 0.2s, border-bottom 0.2s';
             if (loginIcon) {
                 loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png';
                 loginIcon.style.transform = 'scale(1.08) rotate(-6deg)';
                 setTimeout(()=>loginIcon.style.transform='', 200);
             }
+        } else if (master) {
+            tabMaster.classList.add('active');
+            tabUser.classList.remove('active');
+            tabAdmin.classList.remove('active');
+            phoneInput.removeAttribute('pattern');
+            phoneInput.setAttribute('placeholder', 'Телефон мастера');
+            if (phoneLabel) phoneLabel.textContent = 'Телефон';
+            enablePhoneMask();
+            // Анимация
+            tabUser.style.transition = 'background 0.2s, border-bottom 0.2s';
+            tabMaster.style.transition = 'background 0.2s, border-bottom 0.2s';
+            tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
+            if (loginIcon) {
+                loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+                loginIcon.style.transform = 'scale(1.08) rotate(6deg)';
+                setTimeout(()=>loginIcon.style.transform='', 200);
+            }
         } else {
             tabUser.classList.add('active');
+            tabMaster.classList.remove('active');
             tabAdmin.classList.remove('active');
             phoneInput.setAttribute('pattern', '\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}');
             phoneInput.setAttribute('placeholder', '+7 (XXX) XXX-XX-XX');
@@ -59,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             enablePhoneMask();
             // Анимация
             tabUser.style.transition = 'background 0.2s, border-bottom 0.2s';
+            tabMaster.style.transition = 'background 0.2s, border-bottom 0.2s';
             tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
             if (loginIcon) {
                 loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
@@ -67,11 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    if (tabUser && tabAdmin) {
-        tabUser.addEventListener('click', function() { setTab(false); });
-        tabAdmin.addEventListener('click', function() { setTab(true); });
+    if (tabUser && tabAdmin && tabMaster) {
+        tabUser.addEventListener('click', function() { setTab(false, false); });
+        tabMaster.addEventListener('click', function() { setTab(false, true); });
+        tabAdmin.addEventListener('click', function() { setTab(true, false); });
     }
-    setTab(false); // По умолчанию пользователь
+    setTab(false, false); // По умолчанию пользователь
 
     if (form) {
         form.addEventListener('submit', async function(e) {
@@ -92,6 +117,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!res.ok) throw new Error(data.error || 'Ошибка входа администратора');
                     localStorage.setItem('adminToken', data.token);
                     window.location.replace('admin.html');
+                } else if (isMaster) {
+                    // Вход как мастер
+                    res = await fetch('/api/role-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone, password })
+                    });
+                    data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Ошибка входа мастера');
+                    localStorage.setItem('token', data.token);
+                    window.location.replace('master.html');
                 } else {
                     // Обычный пользователь
                     res = await fetch('/api/login', {
