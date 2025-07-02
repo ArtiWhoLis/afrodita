@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tbody = document.getElementById('requests-body');
     let allRequests = [];
     let servicesMap = {};
+    let hasServices = true; // Новый флаг
 
     // Получить профиль мастера и его услуги
     async function loadMasterInfo() {
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (msRes.ok) {
                 const ms = await msRes.json();
                 serviceIds = ms.map(x => String(x));
+                hasServices = serviceIds.length > 0;
             }
         }
         // Получить все услуги (для отображения названия)
@@ -61,7 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderRequests(requests) {
         if (!requests.length) {
-            tbody.innerHTML = '<tr><td colspan="6">Нет записей</td></tr>';
+            if (!hasServices) {
+                tbody.innerHTML = '<tr><td colspan="6" style="color:#d17a97;font-weight:bold;">Вам не назначены услуги. Обратитесь к администратору.</td></tr>';
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6">Нет записей</td></tr>';
+            }
             return;
         }
         tbody.innerHTML = '';
