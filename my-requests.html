@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои записи - Афродита</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .myreq-panel-header { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 18px; }
+        .myreq-panel-header input { padding: 6px 10px; border-radius: 4px; border: 1px solid #ddd; }
+        .service-badge { display: inline-block; background: #f7b6d2; color: #222; border-radius: 6px; padding: 2px 8px; font-size: 0.95em; margin-right: 4px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-flex">
+            <a href="index.html" class="logo">Афродита</a>
+            <nav class="main-nav" aria-label="Главное меню">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="services.html">Услуги</a></li>
+                    <li><a href="booking.html">Запись</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="my-requests.html" class="active">Мои записи</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="page-title fade-in">
+            <div class="container">
+                <h1>Мои записи</h1>
+            </div>
+        </section>
+        <section>
+            <div class="container" style="max-width:1000px;margin:auto;">
+                <div class="myreq-panel-header">
+                    <input type="date" id="filter-date">
+                    <input type="text" id="filter-search" placeholder="Поиск по услуге, дате или комментарию">
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Услуга</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Комментарий</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myreq-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Салон красоты "Афродита". Все права защищены.</p>
+        </div>
+    </footer>
+    <script src="js/my-requests.js"></script>
+</body>
+</html> 

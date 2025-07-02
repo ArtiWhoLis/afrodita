@@ -224,6 +224,14 @@
                     masterBtn.textContent = 'Панель мастера';
                     const dropdown = document.getElementById('profilePanelDropdown');
                     dropdown.insertBefore(masterBtn, dropdown.querySelector('.profile-panel__action[href="profile.html"]'));
+                } else if (user.role !== 'admin') {
+                    // Для обычного пользователя
+                    const myReqBtn = document.createElement('a');
+                    myReqBtn.href = 'my-requests.html';
+                    myReqBtn.className = 'profile-panel__action';
+                    myReqBtn.textContent = 'Мои записи';
+                    const dropdown = document.getElementById('profilePanelDropdown');
+                    dropdown.insertBefore(myReqBtn, dropdown.querySelector('.profile-panel__action[href="profile.html"]'));
                 }
                 // Добавить кнопку Админ-панель, если есть роль admin
                 if (user.role === 'admin') {
