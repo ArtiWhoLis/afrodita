@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tabMaster.style.transition = 'background 0.2s, border-bottom 0.2s';
             tabAdmin.style.transition = 'background 0.2s, border-bottom 0.2s';
             if (loginIcon) {
-                loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+                loginIcon.src = 'https://cdn-icons-png.flaticon.com/512/2922/2922510.png';
                 loginIcon.style.transform = 'scale(1.08) rotate(6deg)';
                 setTimeout(()=>loginIcon.style.transform='', 200);
             }

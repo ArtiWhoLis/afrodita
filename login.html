@@ -5,6 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - Афродита</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+    .login-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        background: #faf7fa;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #d17a9722;
+        margin-bottom: 18px;
+        overflow: hidden;
+        width: 100%;
+        max-width: 420px;
+    }
+    .login-tab {
+        flex: 1 1 0;
+        padding: 8px 0 7px 0;
+        font-size: 1.04em;
+        font-weight: 500;
+        color: #b97a8a;
+        background: none;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s;
+        outline: none;
+        margin: 0;
+    }
+    .login-tab.active {
+        color: #d17a97;
+        background: #fff;
+        border-bottom: 2.5px solid #d17a97;
+        font-weight: bold;
+        z-index: 2;
+    }
+    .login-tab:not(.active):hover {
+        background: #f7e6ee;
+        color: #d17a97;
+    }
+    </style>
 </head>
 <body>
     <header>
